@@ -1,0 +1,54 @@
+---
+/**
+ * CTA final: luz de LED na borda (M2) + monograma em marca d'água.
+ * Usado na home e no hub Previdenciário. `linhas` = título quebrado à mão
+ * (evita quebras ruins como "A / gente explica").
+ */
+import Monogram from "../ui/Monogram.astro";
+import WhatsAppButton from "../ui/WhatsAppButton.astro";
+
+interface Props {
+  linhas: string[];
+  texto: string;
+  mensagem: string;
+  label?: string;
+}
+
+const { linhas, texto, mensagem, label = "Conversar pelo WhatsApp" } = Astro.props;
+---
+
+<section class="section tone-dark bg-marmore cta" aria-labelledby="cta-titulo">
+  <div class="container cta__inner led-frame">
+    <Monogram size={320} class="cta__marca" />
+    <h2 id="cta-titulo">{linhas.map((linha) => <span class="cta__linha">{linha}</span>)}</h2>
+    <p class="lead">{texto}</p>
+    <WhatsAppButton message={mensagem} label={label} />
+  </div>
+</section>
+
+<style>
+  .cta__inner {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+    padding: var(--space-8) var(--space-6);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .cta__inner > :not(.cta__marca) { position: relative; }
+  .cta__inner h2, .cta__inner p { margin: 0; }
+  .cta__inner h2 { max-width: 24ch; }
+  .cta__linha { display: block; }
+  .cta__inner p { max-width: 46ch; }
+  .cta :global(.cta__marca) {
+    position: absolute;
+    right: -2rem;
+    bottom: -3rem;
+    width: min(20rem, 70%);
+    height: auto;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+</style>

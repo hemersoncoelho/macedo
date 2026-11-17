@@ -1,0 +1,200 @@
+---
+/**
+ * Gráfico "Quem pode receber a pensão por morte": a fila da família em degraus.
+ * Um grupo só recebe se o de cima estiver vazio; os degraus descem para a direita
+ * e o fio liga uma numeração à seguinte. Embaixo: o que mais conta e o prazo de 90 dias
+ * (anel que se desenha, M7). O conteúdo é HTML real; fios e anel são decorativos.
+ * ⚠ Textos a validar pelo escritório antes da publicação.
+ */
+import Icon, { type IconName } from "../ui/Icon.astro";
+
+interface Grupo {
+  titulo: string;
+  texto: string;
+  /** Dependência presumida (não precisa provar) ou a provar. */
+  presumida: boolean;
+}
+
+const grupos: Grupo[] = [
+  {
+    titulo: "Cônjuge ou companheiro(a) e filhos",
+    texto: "Filhos menores de 21 anos, ou de qualquer idade se tiverem invalidez ou deficiência. Havendo alguém neste grupo, a pensão é dividida entre eles e os grupos de baixo ficam de fora.",
+    presumida: true,
+  },
+  {
+    titulo: "Pais",
+    texto: "Só recebem se não houver ninguém no grupo 1.",
+    presumida: false,
+  },
+  {
+    titulo: "Irmãos",
+    texto: "Só recebem se não houver ninguém nos grupos 1 e 2. Precisam ser menores de 21 anos, ou ter invalidez ou deficiência.",
+    presumida: false,
+  },
+];
+
+const apoios: { icon: IconName; titulo: string; texto: string }[] = [
+  {
+    icon: "shield",
+    titulo: "O falecido era segurado",
+    texto: "Contribuía, era aposentado, ou ainda estava protegido pelo INSS depois de parar de contribuir.",
+  },
+  {
+    icon: "file",
+    titulo: "O vínculo precisa ser provado",
+    texto: "Certidão de casamento, prova de união estável ou certidões de nascimento dos filhos.",
+  },
+];
+---
+
+<div class="fila">
+  <ol class="fila__grupos" data-reveal-group>
+    {grupos.map((g, i) => (
+      <Fragment>
+        <li class="grupo" data-reveal style={`--n:${i}`}>
+          <span class="grupo__num" aria-hidden="true">{i + 1}</span>
+          <div class="grupo__corpo">
+            <h3>{g.titulo}</h3>
+            <p>{g.texto}</p>
+            <p class:list={["grupo__tag", { "grupo__tag--ok": g.presumida }]}>
+              <Icon name={g.presumida ? "check" : "file"} size={18} />
+              {g.presumida ? "Não precisa provar que dependia do falecido" : "É preciso provar que dependia do falecido"}
+            </p>
+          </div>
+        </li>
+        {i < grupos.length - 1 && (
+          <li class="fila__elo" data-reveal style={`--n:${i + 1}`} aria-hidden="true">
+            <span>só entra se não houver ninguém no grupo {i + 1}</span>
+          </li>
+        )}
+      </Fragment>
+    ))}
+  </ol>
+
+  <div class="apoios" data-reveal-group>
+    {apoios.map((a) => (
+      <article class="apoio" data-reveal>
+        <Icon name={a.icon} size={28} class="apoio__icon" />
+        <h3>{a.titulo}</h3>
+        <p>{a.texto}</p>
+      </article>
+    ))}
+
+    <article class="prazo" data-reveal data-draw>
+      <svg class="prazo__anel" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <circle class="prazo__trilho" cx="50" cy="50" r="44" />
+        <circle class="prazo__arco" cx="50" cy="50" r="44" pathLength="1" />
+      </svg>
+      <p class="prazo__num" aria-hidden="true"><strong>90</strong><span>dias</span></p>
+      <h3>Prazo para pedir</h3>
+      <p>Pedir em até <strong>90 dias</strong> do falecimento garante o pagamento desde a data do óbito. Depois, conta só a partir do pedido.</p>
+    </article>
+  </div>
+</div>
+
+<style>
+  .fila { display: grid; gap: var(--space-7); --indent: var(--space-4); }
+
+  .fila__grupos { display: block; margin: 0; padding: 0; list-style: none; }
+
+  .grupo {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    margin-left: calc(var(--n) * var(--indent));
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .grupo__num {
+    display: grid; place-items: center;
+    width: 3rem; height: 3rem;
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: 50%;
+    font-family: var(--font-display); font-weight: 700; font-size: 1.25rem;
+    color: var(--color-accent);
+  }
+  .grupo h3 { margin: 0 0 var(--space-2); font-size: var(--text-h3); }
+  .grupo p { margin: 0; color: var(--color-text-muted); }
+  .grupo__tag {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    margin-top: var(--space-4) !important;
+    font-size: var(--text-small);
+  }
+  .grupo__tag :global(svg) { flex: none; }
+  .grupo__tag--ok { color: var(--sucesso-700) !important; font-weight: 600; }
+
+  /* Fio ligando a numeração de um degrau à do seguinte */
+  .fila__elo {
+    position: relative;
+    display: flex; align-items: center;
+    min-height: 3.25rem;
+    margin-left: calc(var(--n) * var(--indent) + 3rem - 1px);
+    padding-left: var(--space-5);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+  .fila__elo::before {
+    content: "";
+    position: absolute; inset: 0 auto 0 0;
+    width: 2px;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: transform 700ms var(--ease-assinatura) calc(var(--i, 0) * var(--stagger) + 200ms);
+  }
+  :global(.js:not(.motion-fallback)) .fila__elo:not(:global(.is-in))::before { transform: scaleY(0); }
+
+  /* O que mais conta + prazo */
+  .apoios { display: grid; gap: var(--space-4); }
+  .apoio {
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-top: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .apoio h3 { margin: var(--space-3) 0 var(--space-2); font-size: var(--text-h3); }
+  .apoio p { margin: 0; color: var(--color-text-muted); }
+  .apoio :global(.apoio__icon) { color: var(--color-accent); }
+
+  .prazo {
+    position: relative;
+    display: grid; justify-items: start; gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--grafite-950);
+    border-radius: var(--radius-md);
+    color: var(--prata-300);
+  }
+  .prazo h3 { margin: var(--space-3) 0 0; font-size: var(--text-h3); color: var(--branco); }
+  .prazo p { margin: 0; }
+  .prazo strong { color: var(--madeira-400); font-weight: 600; }
+  .prazo__anel { width: 6.5rem; height: 6.5rem; transform: rotate(-90deg); }
+  .prazo__anel circle { fill: none; stroke-width: 3; }
+  .prazo__trilho { stroke: var(--grafite-800); }
+  .prazo__arco {
+    stroke: var(--madeira-400); stroke-linecap: round;
+    stroke-dasharray: 1; stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1400ms var(--ease-assinatura) 300ms;
+  }
+  :global(.js:not(.motion-fallback)) .prazo:not(:global(.is-in)) .prazo__arco { stroke-dashoffset: 1; }
+  .prazo__num {
+    position: absolute; top: var(--space-5); left: var(--space-5);
+    display: grid; place-content: center; justify-items: center;
+    width: 6.5rem; height: 6.5rem; line-height: 1;
+  }
+  .prazo__num strong { font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--branco); }
+  .prazo__num span { font-size: var(--text-small); color: var(--prata-500); }
+
+  @media (min-width: 48em) {
+    .fila { --indent: var(--space-8); }
+    .apoios { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fila__elo::before, .prazo__arco { transition: none; }
+    :global(.js:not(.motion-fallback)) .fila__elo:not(:global(.is-in))::before { transform: none; }
+    :global(.js:not(.motion-fallback)) .prazo:not(:global(.is-in)) .prazo__arco { stroke-dashoffset: 0; }
+  }
+</style>

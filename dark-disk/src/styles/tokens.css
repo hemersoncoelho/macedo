@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Macedo Neto — Design Tokens
+   Fonte da verdade visual. Nomes das cores = materiais do escritório.
+   Contrastes WCAG documentados em DESIGN.md.
+   ========================================================================== */
+
+:root {
+  /* ---------- Cores primitivas (materiais) ---------- */
+  --grafite-950: #111214; /* ACM preto da fachada */
+  --grafite-900: #1c1e21;
+  --grafite-800: #2a2d31;
+  --marmore-600: #5b5f66; /* mármore cinza */
+  --marmore-200: #d9d8d4;
+  --prata-500: #9a9ea5;
+  --prata-300: #c9ccd1;   /* letras de aço */
+  --pedra-50: #f4f2ee;    /* off-white quente (piso) */
+  --branco: #ffffff;
+  --madeira-700: #8a5530; /* marcenaria — CTA sobre claro */
+  --madeira-400: #c49a6c; /* marcenaria — CTA sobre escuro */
+  --sucesso-700: #1f7a4d; /* WhatsApp acessível */
+  --sucesso-800: #186240;
+  --alerta-700: #8a4b00;
+
+  /* ---------- Tipografia ---------- */
+  --font-display: "Montserrat", "Segoe UI", Arial, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --font-quote: "Cormorant Garamond", Georgia, serif;
+
+  --text-small: 1rem;                                       /* 16px — mínimo absoluto */
+  --text-body: 1.125rem;                                    /* 18px */
+  --text-lead: clamp(1.25rem, 1.15rem + 0.4vw, 1.375rem);   /* 20 → 22 */
+  --text-h3: clamp(1.375rem, 1.2rem + 0.7vw, 1.625rem);     /* 22 → 26 */
+  --text-h2: clamp(1.75rem, 1.35rem + 1.7vw, 2.375rem);     /* 28 → 38 */
+  --text-h1: clamp(2.125rem, 1.35rem + 3.3vw, 3.5rem);      /* 34 → 56 */
+
+  --leading-body: 1.65;
+  --leading-heading: 1.15;
+  --tracking-overline: 0.16em;
+  --measure: 70ch;
+
+  /* ---------- Espaçamento (base 8) ---------- */
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.5rem;   /* 24 */
+  --space-6: 2rem;     /* 32 */
+  --space-7: 3rem;     /* 48 */
+  --space-8: 4rem;     /* 64 */
+  --space-9: 6rem;     /* 96 */
+  --space-10: 8rem;    /* 128 */
+  --section-y: clamp(var(--space-8), 6vw + 1rem, var(--space-10));
+
+  /* ---------- Layout ---------- */
+  --container: 75rem;  /* 1200px */
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --target-min: 3rem;  /* 48px — alvo de toque */
+
+  /* ---------- Forma ---------- */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --border-width: 1px;
+  --shadow-lift: 0 8px 24px -12px rgb(17 18 20 / 0.35);
+
+  /* ---------- Motion ---------- */
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 300ms;
+  --dur-page: 650ms; /* revelação "a luz desce" entre páginas */
+  --dur-slow: 600ms;
+  --dur-signature: 1200ms;
+  --stagger: 70ms;
+
+  --ease-assinatura: cubic-bezier(0.22, 1, 0.36, 1); /* "pedra pousando" */
+  --ease-saida: cubic-bezier(0.4, 0, 1, 1);
+  --ease-padrao: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --move-sm: 4px;
+  --move-md: 16px;
+
+  /* ---------- Camadas ---------- */
+  --z-header: 50;
+  --z-float: 60;
+
+  /* ---------- Semânticos (tom claro = padrão) ---------- */
+  --color-bg: var(--pedra-50);
+  --color-surface: var(--branco);
+  --color-text: var(--grafite-950);
+  --color-text-muted: var(--marmore-600);
+  --color-border: var(--marmore-200);
+  --color-accent: var(--madeira-700);
+  --color-accent-hover: #6f4426;
+  --color-on-accent: var(--branco);
+  --color-focus: var(--madeira-700);
+}
+
+/* Tom escuro ("Noite"): aplicado por seção com .tone-dark */
+.tone-dark {
+  --color-bg: var(--grafite-950);
+  --color-surface: var(--grafite-900);
+  --color-text: var(--prata-300);
+  --color-text-muted: var(--prata-500);
+  --color-border: var(--grafite-800);
+  --color-accent: var(--madeira-400);
+  --color-accent-hover: #d6b38c;
+  --color-on-accent: var(--grafite-950);
+  --color-focus: var(--madeira-400);
+}

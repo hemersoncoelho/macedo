@@ -1,0 +1,321 @@
+---
+/**
+ * Design System vivo — Macedo Neto. Rota: /design-system (noindex).
+ * Documentação completa em DESIGN.md.
+ */
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import Monogram from "../components/ui/Monogram.astro";
+import Button from "../components/ui/Button.astro";
+import WhatsAppButton from "../components/ui/WhatsAppButton.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import ServiceCard from "../components/ui/ServiceCard.astro";
+import Steps from "../components/ui/Steps.astro";
+import LawyerCard from "../components/ui/LawyerCard.astro";
+import Testimonial from "../components/ui/Testimonial.astro";
+import Accordion from "../components/ui/Accordion.astro";
+import AntiScamNotice from "../components/ui/AntiScamNotice.astro";
+import Divider from "../components/ui/Divider.astro";
+import { site } from "../data/site";
+
+const cores = [
+  { token: "grafite-950", hex: "#111214", origem: "ACM preto da fachada", uso: "Fundo escuro · texto sobre claro", contraste: "16,8:1 sobre pedra-50", escuro: true },
+  { token: "grafite-900", hex: "#1C1E21", origem: "—", uso: "Superfícies no escuro", contraste: "—", escuro: true },
+  { token: "marmore-600", hex: "#5B5F66", origem: "Mármore cinza", uso: "Texto secundário sobre claro", contraste: "5,7:1 AA", escuro: true },
+  { token: "prata-300", hex: "#C9CCD1", origem: "Letras de aço", uso: "Texto e logo sobre escuro", contraste: "11,6:1 AAA", escuro: false },
+  { token: "prata-500", hex: "#9A9EA5", origem: "—", uso: "Texto secundário sobre escuro", contraste: "7,0:1 AAA", escuro: false },
+  { token: "pedra-50", hex: "#F4F2EE", origem: "Piso / off-white quente", uso: "Fundo claro", contraste: "—", escuro: false },
+  { token: "madeira-700", hex: "#8A5530", origem: "Marcenaria", uso: "CTA e links sobre claro", contraste: "5,5:1 AA", escuro: true },
+  { token: "madeira-400", hex: "#C49A6C", origem: "Marcenaria", uso: "CTA e destaque sobre escuro", contraste: "7,3:1 AAA", escuro: false },
+  { token: "sucesso-700", hex: "#1F7A4D", origem: "WhatsApp acessível", uso: "Botão WhatsApp", contraste: "5,3:1 AA (texto branco)", escuro: true },
+];
+
+const escala = [
+  { token: "h1", px: "34 → 56px", amostra: "Seu direito, com clareza" },
+  { token: "h2", px: "28 → 38px", amostra: "Como podemos ajudar" },
+  { token: "h3", px: "22 → 26px", amostra: "Pensão por morte" },
+  { token: "lead", px: "20 → 22px", amostra: "Orientação jurídica clara, do pedido ao resultado." },
+  { token: "body", px: "18px", amostra: "Analisamos o seu caso e explicamos cada etapa em linguagem simples." },
+  { token: "small", px: "16px (mínimo)", amostra: "Legendas, rodapé e rótulos." },
+];
+
+const espacos = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128];
+
+const servicos = [
+  { slug: "bpc-loas", icon: "users", title: "BPC/LOAS", question: "Pessoa idosa ou com deficiência e baixa renda?" },
+  { slug: "auxilio-doenca", icon: "heart", title: "Auxílio-doença", question: "Está sem poder trabalhar por doença?" },
+  { slug: "aposentadoria-rural", icon: "sprout", title: "Aposentadoria rural", question: "Trabalhou no campo a vida toda?" },
+  { slug: "pensao-por-morte", icon: "user", title: "Pensão por morte", question: "Perdeu alguém que contribuía com o INSS?" },
+  { slug: "salario-maternidade", icon: "heart", title: "Salário-maternidade", question: "Vai ter ou teve bebê recentemente?" },
+  { slug: "beneficio-negado", icon: "file", title: "Benefício negado", question: "O INSS negou ou cortou seu benefício?" },
+] as const;
+
+const passos = [
+  { title: "Você conta o seu caso", text: "Pelo WhatsApp ou no escritório, sem precisar levar documentos no primeiro contato." },
+  { title: "Analisamos o seu direito", text: "Explicamos, em linguagem simples, quais caminhos existem para a sua situação." },
+  { title: "Acompanhamos até o fim", text: "Cuidamos do pedido e mantemos você informado em cada etapa." },
+];
+
+const faq = [
+  { pergunta: "Preciso levar documentos no primeiro contato?", resposta: "Não. Primeiro entendemos a sua situação; depois orientamos quais documentos ajudam no seu caso." },
+  { pergunta: "Vocês atendem pelo WhatsApp?", resposta: "Sim. O WhatsApp é o nosso canal principal de atendimento. (Confirmar horários com o escritório.)" },
+  { pergunta: "Como sei que a mensagem é mesmo do escritório?", resposta: "Só falamos pelo número oficial divulgado neste site e nunca pedimos Pix para liberar benefício." },
+];
+
+const motionTokens = [
+  { token: "--dur-fast", valor: "200ms", uso: "Botões, ícones, sublinhado" },
+  { token: "--dur-base", valor: "300ms", uso: "Acordeão, menu, header" },
+  { token: "--dur-page", valor: "650ms", uso: "Troca de página: a luz desce (View Transitions)" },
+  { token: "--dur-slow", valor: "600ms", uso: "Revelação de seções e cards" },
+  { token: "--dur-signature", valor: "1200ms", uso: "M1: monograma (1x por sessão)" },
+  { token: "--ease-assinatura", valor: "cubic-bezier(.22,1,.36,1)", uso: "~80% das animações: \"pedra pousando\"" },
+  { token: "--ease-saida", valor: "cubic-bezier(.4,0,1,1)", uso: "Saídas (sempre mais curtas)" },
+];
+
+const voz = [
+  { faca: "Teve seu benefício negado? Vamos analisar seu caso.", evite: "Garantimos seu benefício. (promessa de resultado, vedada pela OAB)" },
+  { faca: "Auxílio-doença (auxílio por incapacidade temporária)", evite: "Somente o termo técnico" },
+  { faca: "Frases curtas, falando com \"você\"", evite: "Juridiquês, latim, voz passiva" },
+  { faca: "Do pedido ao resultado, com você", evite: "O melhor escritório da região (comparativo)" },
+];
+---
+
+<Layout title="Design System | Macedo Neto" noindex>
+  <SiteHeader nav={[
+    { label: "Cores", href: "#cores" },
+    { label: "Tipografia", href: "#tipografia" },
+    { label: "Componentes", href: "#componentes" },
+    { label: "Motion", href: "#motion" },
+    { label: "Voz", href: "#voz" },
+  ]} />
+
+  <main id="conteudo">
+    <!-- Hero: M1 + M5 + M2 -->
+    <section class="section tone-dark bg-marmore hero">
+      <div class="container hero__grid">
+        <div class="stack" style="--stack-gap: var(--space-5)">
+          <Monogram size={88} animate label="Monograma Macedo Neto" />
+          <p class="overline">Design System · v0.1</p>
+          <h1 data-reveal-mask>
+            <span class="mask-line"><span style="--i:0">Material nobre,</span></span>
+            <span class="mask-line"><span style="--i:1">linguagem simples.</span></span>
+          </h1>
+          <p class="lead" data-reveal>Premium na aparência, gov.br na usabilidade. Cada token vem do próprio escritório: grafite da fachada, mármore, aço e madeira.</p>
+          <div class="hero__actions" data-reveal>
+            <Button href="#componentes">Ver componentes</Button>
+            <Button href="#motion" variant="secondary" icon="plus">Motion</Button>
+          </div>
+        </div>
+        <div class="hero__panel led-frame" data-reveal-clip>
+          <Monogram size={160} />
+          <p class="overline">M2 · luz de LED na borda</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Princípios -->
+    <section class="section">
+      <div class="container">
+        <SectionHeading overline="Fundamentos" title="Princípios" />
+        <ol class="principios" data-reveal-group>
+          <li data-reveal><strong>Material nobre, não clichê jurídico.</strong> Sem balança, martelo, colunas ou azul-marinho.</li>
+          <li data-reveal><strong>O monograma é o sistema.</strong> As diagonais do MN geram divisores, molduras e marcas d'água.</li>
+          <li data-reveal><strong>Poucas cores, com intenção.</strong> Grafite + prata + madeira; neutros quentes.</li>
+          <li data-reveal><strong>Escala curta, corpo grande.</strong> Texto corrido nunca abaixo de 18px.</li>
+          <li data-reveal><strong>Acessível por padrão.</strong> WCAG 2.2 AA, alvos de 48px, foco sempre visível.</li>
+          <li data-reveal><strong>O movimento revela, não decora.</strong> Uma vez só, curto, e desligável.</li>
+          <li data-reveal><strong>A voz faz parte do sistema.</strong> Clara, acolhedora e dentro das regras da OAB.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Cores -->
+    <section class="section tone-dark" id="cores">
+      <div class="container">
+        <SectionHeading overline="Tokens" title="Cores" lead="Nomeadas pelos materiais do escritório. Contrastes calculados pela fórmula WCAG." />
+        <div class="grid" style="--grid-min: 15rem" data-reveal-group>
+          {cores.map((cor) => (
+            <figure class="swatch" data-reveal>
+              <div class="swatch__chip" style={`background:${cor.hex}; color:${cor.escuro ? "#fff" : "#111214"}`}>{cor.hex}</div>
+              <figcaption>
+                <strong>{cor.token}</strong>
+                <span class="muted small">{cor.origem}</span>
+                <span class="small">{cor.uso}</span>
+                <span class="small swatch__ratio">{cor.contraste}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Tipografia -->
+    <section class="section" id="tipografia">
+      <div class="container">
+        <SectionHeading overline="Tokens" title="Tipografia" lead="Montserrat (títulos, ecoa o letreiro), Source Sans 3 (leitura) e Cormorant Garamond itálico só na 'voz' (citações)." />
+        <div class="type-list">
+          {escala.map((t) => (
+            <div class="type-row" data-reveal>
+              <span class="overline">{t.token} · {t.px}</span>
+              <p style={`font-size: var(--text-${t.token}); font-family: ${t.token.startsWith("h") ? "var(--font-display)" : "var(--font-body)"}; font-weight: ${t.token.startsWith("h") ? 700 : 400}; max-width: none`}>{t.amostra}</p>
+            </div>
+          ))}
+          <div class="type-row" data-reveal>
+            <span class="overline">overline · 16px · caixa alta · 0.16em</span>
+            <p class="overline" style="color: var(--color-text)">Advocacia Especializada</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Espaço e forma -->
+    <section class="section">
+      <div class="container">
+        <SectionHeading overline="Tokens" title="Espaçamento e forma" lead="Base 8px. Raio de 2 a 4px, quase reto como a arquitetura da fachada. Profundidade por contraste, não por sombra." />
+        <div class="space-list" data-reveal>
+          {espacos.map((px, i) => (
+            <div class="space-row"><span class="small muted">--space-{i + 1}</span><span class="space-bar" style={`width:${px}px`}></span><span class="small">{px}px</span></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Componentes -->
+    <section class="section" id="componentes">
+      <div class="container stack" style="--stack-gap: var(--space-9)">
+        <div>
+          <SectionHeading overline="Componentes" title="Botões" />
+          <div class="row" data-reveal>
+            <Button href="#">Agendar conversa</Button>
+            <Button href="#" variant="secondary">Como funciona</Button>
+            <Button href="#" variant="ghost">Saiba mais</Button>
+            <WhatsAppButton />
+          </div>
+          <div class="row tone-dark demo-dark" data-reveal>
+            <Button href="#">Agendar conversa</Button>
+            <Button href="#" variant="secondary">Como funciona</Button>
+            <Button href="#" variant="ghost">Saiba mais</Button>
+          </div>
+        </div>
+
+        <div id="previdenciario">
+          <SectionHeading overline="Componentes" title="Card de serviço" lead="Pergunta orientadora + título. O card inteiro é clicável; o título faz morph para a página do benefício (M8)." />
+          <div class="grid" data-reveal-group>
+            {servicos.map((s) => <ServiceCard href={`#${s.slug}`} icon={s.icon} title={s.title} question={s.question} slug={s.slug} />)}
+          </div>
+        </div>
+
+        <div>
+          <SectionHeading overline="Componentes" title="Passo a passo" lead="M7: o fio liga 01 → 02 → 03 ao entrar na tela." />
+          <Steps steps={passos} />
+        </div>
+
+        <div id="equipe">
+          <SectionHeading overline="Componentes" title="Card de advogado" lead="Sem foto, usa as iniciais sobre mármore. Fotos: fundo liso, luz quente, P&B → cor no hover." />
+          <div class="grid" style="--grid-min: 14rem" data-reveal-group>
+            {site.advogados.map((adv) => <LawyerCard nome={adv.nome} oab={adv.oab} />)}
+          </div>
+        </div>
+
+        <div>
+          <SectionHeading overline="Componentes" title="Depoimento" lead="Só com autorização escrita (LGPD) e decisão do escritório sobre o Provimento 205/2021. Nunca o print bruto." />
+          <div class="grid" style="--grid-min: 20rem">
+            <Testimonial iniciais="A. B." beneficio="Exemplo" texto="Texto de exemplo. Depoimentos reais só com autorização escrita do cliente, por iniciais." />
+            <Testimonial iniciais="J. R." beneficio="Aposentadoria" texto="Foram muitos dias de espera, mas deu tudo certo! Obrigado pelo carinho e pelo excelente trabalho." />
+          </div>
+        </div>
+
+        <div class="split">
+          <div>
+            <SectionHeading overline="Componentes" title="FAQ" />
+            <Accordion items={faq} />
+          </div>
+          <div>
+            <SectionHeading overline="Componentes" title="Aviso antigolpe" />
+            <AntiScamNotice />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Motion -->
+    <section class="section tone-dark bg-marmore" id="motion">
+      <div class="container">
+        <SectionHeading overline="Motion" title="Movimento que revela" lead="Duas camadas (lógica IBM Carbon): produtivo para interface, expressivo para momentos de marca. Tudo respeita o 'reduzir movimento' do sistema." />
+        <div class="table-wrap" data-reveal>
+          <table>
+            <caption class="sr-only">Tokens de motion</caption>
+            <thead><tr><th scope="col">Token</th><th scope="col">Valor</th><th scope="col">Uso</th></tr></thead>
+            <tbody>{motionTokens.map((m) => <tr><td><code>{m.token}</code></td><td>{m.valor}</td><td>{m.uso}</td></tr>)}</tbody>
+          </table>
+        </div>
+        <div class="grid motion-demos" data-reveal-group>
+          <div class="demo led-frame" data-reveal><p class="overline">M2</p><h3>Luz de LED</h3><p class="muted">A borda acende uma vez ao entrar na tela.</p></div>
+          <div class="demo" data-reveal><p class="overline">M4</p><h3>Divisor diagonal</h3><Divider /></div>
+          <div class="demo" data-reveal-clip><p class="overline">Clip</p><h3>Revelação por máscara</h3><p class="muted">Usada na foto da sala ("O escritório").</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Voz -->
+    <section class="section" id="voz">
+      <div class="container">
+        <SectionHeading overline="Conteúdo" title="Tom de voz" lead="Claro, acolhedor e respeitoso. Publicidade informativa (Provimento 205/2021 da OAB)." />
+        <div class="table-wrap" data-reveal>
+          <table>
+            <caption class="sr-only">Faça e evite</caption>
+            <thead><tr><th scope="col">Faça</th><th scope="col">Evite</th></tr></thead>
+            <tbody>{voz.map((v) => <tr><td>{v.faca}</td><td class="muted">{v.evite}</td></tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <WhatsAppButton variant="floating" />
+</Layout>
+
+<style>
+  .hero { min-height: min(88vh, 52rem); display: grid; align-items: center; }
+  .hero__grid { display: grid; gap: var(--space-8); align-items: center; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+  .hero__panel {
+    display: grid; place-items: center; gap: var(--space-4);
+    min-height: 22rem; padding: var(--space-7);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: rgb(17 18 20 / 0.5);
+  }
+  @media (min-width: 60em) { .hero__grid { grid-template-columns: 1.3fr 1fr; } }
+
+  .principios { display: grid; gap: var(--space-4); margin: 0; padding-left: var(--space-5); max-width: 48rem; }
+
+  .swatch { margin: 0; display: grid; gap: var(--space-3); }
+  .swatch__chip { display: flex; align-items: flex-end; height: 7rem; padding: var(--space-3); border-radius: var(--radius-md); border: var(--border-width) solid var(--color-border); font-family: var(--font-display); font-size: var(--text-small); }
+  .swatch figcaption { display: grid; gap: var(--space-1); }
+  .swatch__ratio { color: var(--color-accent); }
+
+  .type-list { display: grid; }
+  .type-row { display: grid; gap: var(--space-2); padding-block: var(--space-5); border-bottom: var(--border-width) solid var(--color-border); }
+
+  .space-list { display: grid; gap: var(--space-3); }
+  .space-row { display: grid; grid-template-columns: 7rem 1fr 4rem; align-items: center; gap: var(--space-4); }
+  .space-bar { display: block; height: 0.75rem; max-width: 100%; background: var(--color-accent); border-radius: var(--radius-sm); }
+
+  .row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+  .demo-dark { margin-top: var(--space-5); padding: var(--space-6); background: var(--color-bg); border-radius: var(--radius-md); }
+
+  .split { display: grid; gap: var(--space-8); }
+  @media (min-width: 60em) { .split { grid-template-columns: 1.4fr 1fr; } }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--text-small); }
+  th, td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: var(--border-width) solid var(--color-border); vertical-align: top; }
+  th { font-family: var(--font-display); font-weight: 600; }
+  code { font-size: 0.9em; color: var(--color-accent); }
+
+  .motion-demos { margin-top: var(--space-7); }
+  .demo { display: grid; gap: var(--space-3); align-content: start; padding: var(--space-6); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+</style>

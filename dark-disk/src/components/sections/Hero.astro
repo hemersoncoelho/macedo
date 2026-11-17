@@ -1,0 +1,221 @@
+---
+/**
+ * Hero da home — Previdenciário (INSS) como carro-chefe.
+ * Motion: M1 (monograma se desenha, 1x por sessão), M5 (H1 linha a linha),
+ * M2 (luz de LED na borda da foto) + revelação da foto por máscara.
+ * Conteúdo visível sem JS (ver global.css). Sem dados não confirmados
+ * (anos de experiência, nº de clientes, "consulta grátis").
+ */
+import Monogram from "../ui/Monogram.astro";
+import Button from "../ui/Button.astro";
+import WhatsAppButton from "../ui/WhatsAppButton.astro";
+import Icon, { type IconName } from "../ui/Icon.astro";
+import { beneficios as dadosBeneficios, beneficioUrl } from "../../data/beneficios";
+
+const WHATSAPP_MENSAGEM = "Olá! Gostaria de saber se tenho direito a um benefício do INSS.";
+
+interface Atalho {
+  label: string;
+  href: string;
+}
+
+// Os atalhos vêm de src/data/beneficios.ts: cada benefício novo ganha o chip sozinho.
+// Sem view-transition-name aqui: o morph M8 fica nos cartões de "Como podemos ajudar"
+// (a mesma página não pode ter dois elementos com o mesmo nome).
+const beneficios: Atalho[] = dadosBeneficios.map((b) => ({ label: b.nome, href: beneficioUrl(b.slug) }));
+
+const confianca: { icon: IconName; texto: string }[] = [
+  { icon: "shield", texto: "Advogados inscritos na OAB/MA" },
+  { icon: "message", texto: "Atendimento presencial e pelo WhatsApp" },
+  { icon: "check", texto: "Explicação em linguagem simples" },
+];
+---
+
+<section class="hero section tone-dark bg-marmore" aria-labelledby="hero-titulo">
+  <div class="container hero__grid">
+    <div class="hero__texto">
+      <Monogram size={72} animate class="hero__mono" />
+      <p class="overline" data-reveal>Direito Previdenciário · INSS</p>
+
+      <h1 id="hero-titulo" data-reveal-mask>
+        <span class="mask-line"><span style="--i:0">Benefício do INSS negado</span></span>
+        <span class="mask-line"><span style="--i:1">ou não sabe se tem direito?</span></span>
+      </h1>
+
+      <p class="lead hero__lead" data-reveal style="--i:2">
+        A gente analisa o seu caso e explica, sem complicação, o que dá para fazer: aposentadoria, BPC/LOAS,
+        pensão por morte, salário-maternidade e auxílio-doença.
+      </p>
+
+      <div class="hero__acoes" data-reveal style="--i:3">
+        <WhatsAppButton message={WHATSAPP_MENSAGEM} label="Conversar pelo WhatsApp" />
+        <Button href="#como-funciona" variant="secondary">Como funciona</Button>
+      </div>
+
+      <nav class="hero__atalhos" aria-label="Benefícios do INSS" data-reveal style="--i:4">
+        <p class="small muted">Qual benefício você procura?</p>
+        <ul>
+          {beneficios.map((b) => (
+            <li>
+              <a class="chip" href={b.href}>
+                {b.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Painel decorativo: evoca a parede do escritório (mármore, letras de aço, LED quente) -->
+    <div class="hero__painel led-frame" aria-hidden="true">
+      <Monogram size={200} animate class="hero__painel-mono" />
+      <p class="hero__painel-nome">MACEDO NETO</p>
+      <p class="hero__painel-desc">ADVOCACIA ESPECIALIZADA</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <ul class="hero__confianca" aria-label="Sobre o atendimento">
+      {confianca.map((item) => (
+        <li><Icon name={item.icon} size={22} /><span>{item.texto}</span></li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-7) var(--space-6);
+  }
+  .hero__grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  .hero__texto > * + * { margin-top: var(--space-5); }
+  .hero__texto > .overline { margin-top: var(--space-4); }
+
+  .hero h1 { max-width: 22ch; text-wrap: balance; }
+  .hero__lead { max-width: 52ch; }
+
+  .hero__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .hero__atalhos ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-min);
+    padding-inline: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text);
+    font-size: var(--text-small);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-fast) var(--ease-padrao),
+      color var(--dur-fast) var(--ease-padrao);
+  }
+  .chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* Painel "parede do escritório" — só a partir de 60em; no celular fica o monograma pequeno */
+  .hero__painel { display: none; }
+
+  @media (min-width: 60em) {
+    .hero__texto :global(.hero__mono) { display: none; }
+    .hero__texto > .overline { margin-top: 0; }
+    .hero__painel {
+      position: relative;
+      justify-self: end;
+      width: 100%;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: var(--space-3);
+      aspect-ratio: 4 / 5;
+      max-height: 34rem;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background:
+        /* luz do LED escorrendo pelo mármore */
+        radial-gradient(90% 45% at 50% 0%, rgb(196 154 108 / 0.2), transparent 70%),
+        /* veios */
+        linear-gradient(118deg, transparent 30%, rgb(255 255 255 / 0.07) 30.4%, transparent 31.2%),
+        linear-gradient(152deg, transparent 63%, rgb(255 255 255 / 0.05) 63.3%, transparent 64%),
+        linear-gradient(98deg, transparent 72%, rgb(255 255 255 / 0.04) 72.3%, transparent 73%),
+        linear-gradient(180deg, var(--grafite-800), var(--grafite-900) 60%, var(--grafite-950));
+    }
+    /* faixa de LED no topo do painel (como na sala) */
+    .hero__painel::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 6%; right: 6%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--madeira-400) 15%, #fbe9d2 50%, var(--madeira-400) 85%, transparent);
+      box-shadow: 0 0 28px 6px rgb(196 154 108 / 0.35);
+      transition: opacity 1200ms var(--ease-assinatura) 300ms;
+    }
+    :global(.js:not(.motion-fallback)) .hero__painel:not(:global(.is-in))::after { opacity: 0; }
+
+    .hero__painel :global(.hero__painel-mono) { width: min(12.5rem, 60%); height: auto; }
+    .hero__painel-nome {
+      margin: var(--space-4) 0 0;
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.5rem;
+      letter-spacing: 0.14em;
+      color: var(--prata-300);
+    }
+    .hero__painel-desc {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: var(--tracking-overline);
+      color: var(--prata-500);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__painel::after { transition: none; }
+  }
+
+  .hero__confianca {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-7) 0 0;
+    padding: var(--space-5) 0 0;
+    border-top: var(--border-width) solid var(--color-border);
+    list-style: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+  }
+  .hero__confianca li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .hero__confianca :global(svg) { flex: none; color: var(--color-accent); }
+
+  @media (min-width: 40em) {
+    .hero__confianca { grid-template-columns: repeat(3, auto); justify-content: space-between; }
+  }
+
+  @media (min-width: 60em) {
+    .hero { padding-block: var(--space-9) var(--space-7); }
+    .hero__grid { grid-template-columns: 1.25fr 1fr; gap: var(--space-8); }
+  }
+</style>

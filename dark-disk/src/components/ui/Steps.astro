@@ -1,0 +1,69 @@
+---
+/** Passo a passo numerado (01/02/03). M7: fio que liga os passos ao entrar na tela. */
+interface Step {
+  title: string;
+  text: string;
+}
+interface Props {
+  steps: Step[];
+}
+const { steps } = Astro.props;
+const pad = (n: number): string => String(n).padStart(2, "0");
+---
+
+<ol class="steps" data-draw data-reveal-group>
+  {steps.map((step, index) => (
+    <li class="steps__item" data-reveal>
+      <span class="steps__num" aria-hidden="true">{pad(index + 1)}</span>
+      <h3 class="steps__title">{step.title}</h3>
+      <p class="muted">{step.text}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps {
+    --line-offset: 1.6rem;
+    position: relative;
+    display: grid;
+    gap: var(--space-7);
+    margin: 0; padding: 0; list-style: none;
+  }
+  .steps::before {
+    content: "";
+    position: absolute;
+    left: var(--line-offset); top: var(--space-6); bottom: var(--space-6);
+    width: 1px;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: transform 1200ms var(--ease-assinatura) 200ms;
+  }
+  :global(.js:not(.motion-fallback)) .steps:not(:global(.is-in))::before { transform: scaleY(0); }
+
+  .steps__item { position: relative; display: grid; gap: var(--space-2); padding-left: calc(var(--line-offset) * 2 + var(--space-4)); }
+  .steps__num {
+    position: absolute; left: 0; top: 0;
+    display: grid; place-items: center;
+    width: calc(var(--line-offset) * 2); aspect-ratio: 1;
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-accent);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-small);
+  }
+
+  @media (min-width: 56em) {
+    .steps { grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+    .steps::before {
+      left: var(--line-offset); right: calc(100% / 3); top: var(--line-offset); bottom: auto;
+      width: auto; height: 1px; transform-origin: left;
+    }
+    :global(.js:not(.motion-fallback)) .steps:not(:global(.is-in))::before { transform: scaleX(0); }
+    .steps__item { padding-left: 0; padding-top: calc(var(--line-offset) * 2 + var(--space-4)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .steps::before { transition: none; }
+    :global(.js:not(.motion-fallback)) .steps:not(:global(.is-in))::before { transform: none; }
+  }
+</style>

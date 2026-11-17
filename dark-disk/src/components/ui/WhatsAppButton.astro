@@ -1,0 +1,71 @@
+---
+/**
+ * Canal nº 1 do escritório. Verde acessível (#1F7A4D, 5.3:1 com branco):
+ * o verde oficial #25D366 com texto branco reprova (1.8:1).
+ * Variante "floating": entra uma vez, sem pulsar (WCAG 2.2.2).
+ */
+import Icon from "./Icon.astro";
+import { whatsappUrl } from "../../data/site";
+
+interface Props {
+  message?: string;
+  label?: string;
+  variant?: "inline" | "floating";
+}
+
+const { message, label = "Falar no WhatsApp", variant = "inline" } = Astro.props;
+const href = whatsappUrl(message);
+---
+
+<a
+  class:list={["wa", `wa--${variant}`]}
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={variant === "floating" ? `${label} (abre em nova aba)` : undefined}
+>
+  <Icon name="message" size={22} />
+  <span class:list={[{ "wa__label--floating": variant === "floating" }]}>{label}</span>
+</a>
+
+<style>
+  .wa {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--target-min);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--sucesso-700);
+    color: var(--branco);
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-padrao);
+  }
+  .wa:hover { background: var(--sucesso-800); color: var(--branco); }
+
+  .wa--floating {
+    position: fixed;
+    right: max(var(--space-4), env(safe-area-inset-right));
+    bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    z-index: var(--z-float);
+    min-width: 3.5rem;
+    min-height: 3.5rem;
+    padding: var(--space-3) var(--space-4);
+    border-radius: 999px;
+    box-shadow: var(--shadow-lift);
+    animation: wa-enter var(--dur-slow) var(--ease-assinatura) 1.5s both;
+  }
+  @media (max-width: 40em) {
+    .wa__label--floating { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  }
+  @keyframes wa-enter {
+    from { opacity: 0; transform: translateY(var(--move-md)); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa--floating { animation: none; }
+  }
+</style>

@@ -1,0 +1,70 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = "Macedo Neto | Advocacia Especializada",
+  description = "Orientação jurídica em Direito Previdenciário (INSS), Bancário, Contratual, Trabalhista e Notarial.",
+  noindex = false,
+} = Astro.props;
+
+const FONTS_URL =
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Montserrat:wght@500;600;700&family=Source+Sans+3:wght@400;600&display=swap";
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#111214" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={FONTS_URL} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <!--
+      Antes da primeira pintura: marca .js (habilita estados iniciais das revelações),
+      .intro-seen (M1 já tocou nesta sessão) e um fallback de segurança que exibe
+      tudo se o script de motion não iniciar em 3s.
+    -->
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add("js");
+        try {
+          if (sessionStorage.getItem("mn-intro")) root.classList.add("intro-seen");
+        } catch (e) {}
+        setTimeout(function () {
+          if (!root.classList.contains("motion-ready")) root.classList.add("motion-fallback");
+        }, 3000);
+        // Transição entre páginas ("a luz desce", global.css): liga a linha de LED
+        // só enquanto a view transition roda. Precisa ser script clássico no <head>.
+        window.addEventListener("pagereveal", function (e) {
+          if (!e.viewTransition) return;
+          root.classList.add("vt-nav", "vt-chegou");
+          e.viewTransition.finished.finally(function () {
+            root.classList.remove("vt-nav");
+          });
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <slot />
+    <div class="vt-led" aria-hidden="true"></div>
+    <script>
+      import "../scripts/motion.ts";
+    </script>
+  </body>
+</html>

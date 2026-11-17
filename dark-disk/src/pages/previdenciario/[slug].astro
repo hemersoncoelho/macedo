@@ -1,0 +1,244 @@
+---
+/**
+ * Página de benefício — modelo único para todos (/previdenciario/{slug}).
+ * Ordem fixa e previsível: Topo → Quem tem direito (gráfico próprio) → Documentos →
+ * Como ajudamos → Dúvidas → Outros benefícios → CTA. Conteúdo em src/data/beneficios.ts.
+ * M8: o H1 compartilha view-transition-name com o chip do hero e com os cartões
+ * de "outros benefícios" (nomes únicos por página: o benefício atual não aparece na lista).
+ */
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import SiteFooter from "../../components/layout/SiteFooter.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import Steps from "../../components/ui/Steps.astro";
+import Accordion from "../../components/ui/Accordion.astro";
+import AntiScamNotice from "../../components/ui/AntiScamNotice.astro";
+import ServiceCard from "../../components/ui/ServiceCard.astro";
+import WhatsAppButton from "../../components/ui/WhatsAppButton.astro";
+import Icon from "../../components/ui/Icon.astro";
+import BpcRequisitos from "../../components/graphics/BpcRequisitos.astro";
+import AposentadoriaCaminhos from "../../components/graphics/AposentadoriaCaminhos.astro";
+import PensaoFila from "../../components/graphics/PensaoFila.astro";
+import MaternidadeCalendario from "../../components/graphics/MaternidadeCalendario.astro";
+import AuxilioTrilha from "../../components/graphics/AuxilioTrilha.astro";
+import { beneficios, beneficioUrl, type Beneficio, type GraficoId } from "../../data/beneficios";
+
+export function getStaticPaths() {
+  return beneficios.map((beneficio) => ({ params: { slug: beneficio.slug }, props: { beneficio } }));
+}
+
+interface Props {
+  beneficio: Beneficio;
+}
+
+const { beneficio: b } = Astro.props;
+const graficos: Record<GraficoId, typeof BpcRequisitos> = {
+  bpc: BpcRequisitos,
+  aposentadoria: AposentadoriaCaminhos,
+  pensao: PensaoFila,
+  maternidade: MaternidadeCalendario,
+  auxilio: AuxilioTrilha,
+};
+const Grafico = graficos[b.grafico.id];
+const outros = beneficios.filter((outro) => outro.slug !== b.slug);
+---
+
+<Layout title={b.title} description={b.description}>
+  <SiteHeader />
+
+  <main id="conteudo">
+    <!-- Topo -->
+    <section class="topo tone-dark bg-marmore" aria-labelledby="titulo">
+      <div class="container">
+        <nav class="trilha" aria-label="Você está em">
+          <ol>
+            <li><a href="/">Início</a></li>
+            <li><a href="/previdenciario">Previdenciário</a></li>
+            <li aria-current="page">{b.nome}</li>
+          </ol>
+        </nav>
+
+        <p class="overline" data-reveal>{b.overline}</p>
+        <h1 id="titulo" class="topo__titulo" style={`view-transition-name: servico-${b.slug}; view-transition-class: servico`}>{b.nome}</h1>
+        <p class="lead topo__lead" data-reveal style="--i:1">{b.lead}</p>
+        <div class="topo__acoes" data-reveal style="--i:2">
+          <WhatsAppButton message={b.whatsapp} label="Ver se tenho direito" />
+          <a class="topo__link" href="#quem-tem-direito">Quem tem direito <Icon name="arrow-right" size={20} /></a>
+        </div>
+
+        <ul class="topo__destaques" data-reveal-group>
+          {b.destaques.map((d) => (
+            <li data-reveal><Icon name={d.icon} size={22} /><span>{d.texto}</span></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Quem tem direito (gráfico próprio de cada benefício) -->
+    <section class="section" id="quem-tem-direito">
+      <div class="container">
+        <SectionHeading overline={b.grafico.overline} title={b.grafico.titulo} lead={b.grafico.lead} />
+        <div class="bloco"><Grafico /></div>
+      </div>
+    </section>
+
+    <!-- Documentos -->
+    <section class="section section--alt" id="documentos">
+      <div class="container">
+        <SectionHeading
+          overline="Para separar"
+          title="Documentos que ajudam"
+          lead="Não precisa ter tudo para falar com a gente. Comece com o que tiver em mãos."
+        />
+        <ul class="checklist" data-reveal-group>
+          {b.documentos.map((doc) => (
+            <li data-reveal>
+              <svg class="checklist__ok" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="10.5" pathLength="1" />
+                <path d="M7.5 12.5l3 3 6-6.5" pathLength="1" />
+              </svg>
+              <span>{doc}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Como ajudamos -->
+    <section class="section" id="como-funciona">
+      <div class="container">
+        <SectionHeading overline="Passo a passo" title="Como ajudamos" />
+        <div class="bloco"><Steps steps={b.passos} /></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--alt" id="duvidas">
+      <div class="container">
+        <SectionHeading overline="Dúvidas comuns" title="Perguntas frequentes" />
+        <div class="bloco"><Accordion items={b.perguntas} name={`faq-${b.slug}`} /></div>
+        <div class="bloco"><AntiScamNotice /></div>
+      </div>
+    </section>
+
+    <!-- Outros benefícios: ajuda quem não sabe qual benefício procurar -->
+    {outros.length > 0 && (
+      <section class="section" id="outros-beneficios" aria-labelledby="outros-titulo">
+        <div class="container">
+          <SectionHeading overline="Outros benefícios" title="Não é bem o seu caso?" lead="Veja se outro benefício combina mais com a sua situação." />
+          <div class="grid bloco" style="--grid-min: 16rem" data-reveal-group>
+            {outros.map((o) => (
+              <ServiceCard href={beneficioUrl(o.slug)} icon={o.icon} title={o.nome} question={o.pergunta} slug={o.slug} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA final -->
+    <section class="section tone-dark bg-marmore cta">
+      <div class="container cta__inner led-frame">
+        <h2>Quer conversar sobre o seu caso?</h2>
+        <p class="lead">Mande uma mensagem. A gente explica, em linguagem simples, o que dá para fazer no seu caso.</p>
+        <WhatsAppButton message={b.whatsapp} label="Conversar pelo WhatsApp" />
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <WhatsAppButton variant="floating" message={b.whatsapp} />
+</Layout>
+
+<style>
+  .bloco { margin-top: var(--space-7); }
+  .section--alt { background: var(--color-surface); }
+
+  /* Topo */
+  .topo { padding-block: var(--space-6) var(--space-8); }
+  .trilha ol {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);
+    margin: 0 0 var(--space-7); padding: 0; list-style: none;
+    font-size: var(--text-small); color: var(--color-text-muted);
+  }
+  .trilha li + li::before { content: "›"; margin-right: var(--space-2); }
+  .trilha a { color: inherit; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  .trilha a:hover { color: var(--color-accent); }
+
+  .topo__titulo {
+    width: fit-content;
+    max-width: 100%;
+    margin-block: var(--space-3) var(--space-5);
+    font-size: clamp(2.5rem, 1.6rem + 5.5vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    color: var(--branco);
+  }
+  .topo__lead { max-width: 52ch; }
+  .topo__acoes {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+  .topo__link {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--target-min);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-small);
+    color: var(--color-accent); text-decoration: none;
+  }
+  .topo__link:hover { color: var(--color-accent-hover); }
+
+  .topo__destaques {
+    display: grid; gap: var(--space-3);
+    margin: var(--space-8) 0 0; padding: var(--space-5) 0 0;
+    border-top: var(--border-width) solid var(--color-border);
+    list-style: none; color: var(--color-text-muted);
+  }
+  .topo__destaques li { display: flex; align-items: center; gap: var(--space-3); }
+  .topo__destaques :global(svg) { flex: none; color: var(--color-accent); }
+
+  /* Checklist com ✓ se desenhando em cascata */
+  .checklist {
+    display: grid; gap: var(--space-3);
+    margin: var(--space-7) 0 0; padding: 0; list-style: none;
+  }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+  }
+  .checklist__ok { flex: none; }
+  .checklist__ok circle, .checklist__ok path {
+    fill: none; stroke: var(--sucesso-700); stroke-width: 1.75;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1; stroke-dashoffset: 0;
+    transition: stroke-dashoffset 700ms var(--ease-assinatura);
+    transition-delay: calc(var(--i, 0) * var(--stagger) + 200ms);
+  }
+  .checklist__ok path { transition-delay: calc(var(--i, 0) * var(--stagger) + 600ms); }
+  :global(.js:not(.motion-fallback)) .checklist li:not(:global(.is-in)) .checklist__ok :is(circle, path) {
+    stroke-dashoffset: 1;
+  }
+
+  /* CTA final */
+  .cta__inner {
+    display: grid; justify-items: start; gap: var(--space-5);
+    padding: var(--space-7) var(--space-6);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .cta__inner h2, .cta__inner p { margin: 0; max-width: 32ch; }
+  .cta__inner p { max-width: 52ch; }
+
+  @media (min-width: 48em) {
+    .topo__destaques { grid-template-columns: repeat(3, auto); justify-content: space-between; }
+    .checklist { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .checklist__ok :is(circle, path) { transition: none; }
+    :global(.js:not(.motion-fallback)) .checklist li:not(:global(.is-in)) .checklist__ok :is(circle, path) {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

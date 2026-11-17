@@ -1,0 +1,41 @@
+---
+/**
+ * Depoimento. Usar SOMENTE com autorização escrita do cliente (LGPD) e após
+ * decisão do escritório sobre o Provimento 205/2021 da OAB.
+ * Nunca exibir o print bruto do WhatsApp; identificar só por iniciais.
+ */
+interface Props {
+  texto: string;
+  iniciais: string;
+  beneficio: string;
+}
+const { texto, iniciais, beneficio } = Astro.props;
+---
+
+<figure class="tm" data-reveal>
+  <span class="tm__mark" aria-hidden="true">“</span>
+  <blockquote class="tm__text"><p>{texto}</p></blockquote>
+  <figcaption class="tm__cite">
+    <strong>{iniciais}</strong>
+    <span class="muted">· {beneficio}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .tm {
+    position: relative;
+    display: grid; gap: var(--space-4);
+    margin: 0;
+    padding: var(--space-7) var(--space-6) var(--space-6);
+    border-left: 2px solid var(--color-accent);
+    background: var(--color-surface);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+  .tm__mark {
+    position: absolute; top: var(--space-2); left: var(--space-5);
+    color: var(--color-accent);
+    font-family: var(--font-quote); font-size: 4rem; line-height: 1;
+  }
+  .tm__text { margin: 0; font-family: var(--font-quote); font-style: italic; font-weight: 500; font-size: var(--text-lead); line-height: 1.5; }
+  .tm__cite { font-size: var(--text-small); }
+</style>

@@ -1,0 +1,147 @@
+---
+/**
+ * Gráfico "Quem tem direito à aposentadoria": duas réguas de barras
+ * (idade mínima E tempo mínimo) + nota sobre transição e atividade especial.
+ * Barras partem do zero (comparação honesta) e o valor é sempre escrito.
+ * Motion: linhas em cascata (M6) e barras que se preenchem da esquerda (M7).
+ * ⚠ Números em regra (quem começou a contribuir após a reforma de 2019):
+ * validar com o escritório antes da publicação.
+ */
+import Icon from "../ui/Icon.astro";
+
+interface Barra {
+  rotulo: string;
+  valor: number;
+}
+
+const idades: Barra[] = [
+  { rotulo: "Trabalhadora rural", valor: 55 },
+  { rotulo: "Trabalhador rural", valor: 60 },
+  { rotulo: "Mulher, área urbana", valor: 62 },
+  { rotulo: "Homem, área urbana", valor: 65 },
+];
+const tempos: Barra[] = [
+  { rotulo: "Mulher, área urbana", valor: 15 },
+  { rotulo: "Homem, área urbana", valor: 20 },
+  { rotulo: "Trabalhador(a) rural (atividade no campo)", valor: 15 },
+];
+const MAX_IDADE = 65;
+const MAX_TEMPO = 20;
+const pct = (valor: number, max: number): number => Math.round((valor / max) * 100);
+---
+
+<div class="apo">
+  <div class="apo__linha">
+    <section class="apo__bloco" aria-labelledby="apo-idade">
+      <h3 id="apo-idade" class="apo__titulo">Idade mínima</h3>
+      <ul class="barras" data-reveal-group>
+        {idades.map((b) => (
+          <li class="barra" data-reveal style={`--w:${pct(b.valor, MAX_IDADE)}%`}>
+            <span class="barra__rotulo">{b.rotulo}</span>
+            <span class="barra__trilho" aria-hidden="true"><span class="barra__fill"></span></span>
+            <span class="barra__valor">{b.valor} anos</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <p class="apo__e" data-reveal>e</p>
+
+    <section class="apo__bloco" aria-labelledby="apo-tempo">
+      <h3 id="apo-tempo" class="apo__titulo">Tempo mínimo de contribuição</h3>
+      <ul class="barras" data-reveal-group>
+        {tempos.map((b) => (
+          <li class="barra" data-reveal style={`--w:${pct(b.valor, MAX_TEMPO)}%`}>
+            <span class="barra__rotulo">{b.rotulo}</span>
+            <span class="barra__trilho" aria-hidden="true"><span class="barra__fill"></span></span>
+            <span class="barra__valor">{b.valor} anos</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <aside class="apo__nota" data-reveal-group aria-label="Casos especiais">
+    <p class="apo__nota-titulo" data-reveal>Valores de referência para quem começou a contribuir depois da reforma de 2019. Nem todo caso é assim:</p>
+    <ul>
+      <li data-reveal>
+        <Icon name="file" size={24} />
+        <span><strong>Já contribuía antes de novembro de 2019?</strong> Pode valer uma regra de transição, com outras combinações de idade e tempo.</span>
+      </li>
+      <li data-reveal>
+        <Icon name="shield" size={24} />
+        <span><strong>Trabalhou exposto a agentes nocivos?</strong> A atividade especial tem regras próprias e pode contar de forma diferente.</span>
+      </li>
+    </ul>
+  </aside>
+</div>
+
+<style>
+  .apo { display: grid; gap: var(--space-6); }
+
+  .apo__linha { display: grid; gap: var(--space-4); justify-items: center; }
+  .apo__bloco {
+    width: 100%;
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-top: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .apo__titulo { margin: 0 0 var(--space-5); font-size: var(--text-h3); }
+  .apo__e {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-small);
+    letter-spacing: var(--tracking-overline);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .barras { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  .barra {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+  }
+  .barra__rotulo { grid-column: 1 / -1; font-size: var(--text-small); color: var(--color-text-muted); }
+  .barra__trilho {
+    display: block;
+    height: 0.875rem;
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .barra__fill {
+    display: block;
+    width: var(--w);
+    height: 100%;
+    background: linear-gradient(90deg, var(--madeira-700), var(--madeira-400));
+    transition: clip-path 900ms var(--ease-assinatura) calc(var(--i, 0) * var(--stagger) + 250ms);
+  }
+  .barra__valor { font-family: var(--font-display); font-weight: 600; min-width: 5.5ch; text-align: right; }
+  :global(.js:not(.motion-fallback)) .barra:not(:global(.is-in)) .barra__fill { clip-path: inset(0 100% 0 0); }
+
+  .apo__nota {
+    padding: var(--space-5);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .apo__nota-titulo { margin: 0 0 var(--space-4); color: var(--color-text-muted); }
+  .apo__nota ul { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  .apo__nota li { display: flex; align-items: flex-start; gap: var(--space-3); }
+  .apo__nota li :global(svg) { flex: none; margin-top: 2px; color: var(--color-accent); }
+
+  @media (min-width: 48em) {
+    .apo__linha { grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: var(--space-5); }
+    .apo__e { align-self: center; }
+    .apo__nota ul { grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra__fill { transition: none; }
+    :global(.js:not(.motion-fallback)) .barra:not(:global(.is-in)) .barra__fill { clip-path: none; }
+  }
+</style>

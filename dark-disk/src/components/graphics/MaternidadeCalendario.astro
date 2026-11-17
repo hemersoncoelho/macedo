@@ -1,0 +1,148 @@
+---
+/**
+ * Gráfico "Quem tem direito ao salário-maternidade": os 120 dias como 120 pontos
+ * (4 meses de 30) que se acendem em sequência, como dias passando (M7);
+ * depois as situações que dão direito e o quadro da carência (0 × 10 meses).
+ * O conteúdo é HTML real; os pontos são decorativos e o conjunto tem rótulo único.
+ * ⚠ Textos a validar pelo escritório antes da publicação.
+ */
+import Icon, { type IconName } from "../ui/Icon.astro";
+
+const MESES = 4;
+const DIAS_POR_MES = 30;
+
+const situacoes: { icon: IconName; titulo: string; texto: string }[] = [
+  {
+    icon: "heart",
+    titulo: "Parto",
+    texto: "O benefício pode começar até 28 dias antes da data prevista do parto. Vale também em caso de natimorto.",
+  },
+  {
+    icon: "users",
+    titulo: "Adoção ou guarda para adoção",
+    texto: "Quem adota ou recebe a guarda judicial para adoção também tem direito aos 120 dias.",
+  },
+  {
+    icon: "shield",
+    titulo: "Perda da gestação",
+    texto: "Em caso de aborto não criminoso, o benefício é de 2 semanas (14 dias).",
+  },
+];
+
+const semCarencia = ["Empregada com carteira assinada", "Empregada doméstica", "Trabalhadora avulsa"];
+const comCarencia = [
+  "Autônoma ou MEI (contribuinte individual)",
+  "Facultativa (por exemplo, dona de casa que contribui)",
+  "Trabalhadora rural (segurada especial): 10 meses de atividade no campo",
+];
+---
+
+<div class="mat">
+  <section class="mat__bloco" aria-labelledby="mat-dias">
+    <h3 id="mat-dias" class="mat__titulo">O benefício, dia a dia</h3>
+    <figure class="dias" data-draw>
+      <div class="dias__meses" role="img" aria-label="120 dias de benefício, divididos em 4 meses de 30 dias">
+        {Array.from({ length: MESES }, (_, mes) => (
+          <div class="mes">
+            <p class="mes__rotulo">{mes + 1}º mês</p>
+            <div class="mes__pontos">
+              {Array.from({ length: DIAS_POR_MES }, (_, dia) => (
+                <span class="ponto" style={`--d:${mes * DIAS_POR_MES + dia}`}></span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <figcaption><strong>120 dias</strong> de afastamento com o benefício pago, para cuidar do bebê.</figcaption>
+    </figure>
+  </section>
+
+  <section class="mat__bloco" aria-labelledby="mat-quando">
+    <h3 id="mat-quando" class="mat__titulo">Em quais casos</h3>
+    <div class="cards" data-reveal-group>
+      {situacoes.map((s) => (
+        <article class="card" data-reveal>
+          <Icon name={s.icon} size={28} class="card__icon" />
+          <h4>{s.titulo}</h4>
+          <p>{s.texto}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mat__bloco" aria-labelledby="mat-carencia">
+    <h3 id="mat-carencia" class="mat__titulo">E a carência?</h3>
+    <div class="carencia" data-reveal-group>
+      <article class="carencia__col carencia__col--zero" data-reveal>
+        <p class="carencia__num" aria-hidden="true">0</p>
+        <h4>Sem carência</h4>
+        <ul>{semCarencia.map((t) => <li><Icon name="check" size={20} />{t}</li>)}</ul>
+      </article>
+      <article class="carencia__col" data-reveal>
+        <p class="carencia__num" aria-hidden="true">10</p>
+        <h4>10 meses de carência</h4>
+        <ul>{comCarencia.map((t) => <li><Icon name="file" size={20} />{t}</li>)}</ul>
+      </article>
+    </div>
+    <p class="mat__nota" data-reveal>
+      Estava desempregada? Pode ter direito se ainda mantinha a qualidade de segurada. E, se o bebê nasceu antes do tempo,
+      a carência pode ser menor.
+    </p>
+  </section>
+</div>
+
+<style>
+  .mat { display: grid; gap: var(--space-8); }
+  .mat__titulo { margin: 0 0 var(--space-5); font-size: var(--text-h3); }
+
+  /* 120 dias */
+  .dias { margin: 0; padding: var(--space-5); background: var(--color-surface); border: var(--border-width) solid var(--color-border); border-top: 3px solid var(--color-accent); border-radius: var(--radius-md); }
+  .dias__meses { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  .mes__rotulo { margin: 0 0 var(--space-2); font-family: var(--font-display); font-weight: 600; font-size: var(--text-small); color: var(--color-text-muted); }
+  .mes__pontos { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .ponto {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-accent);
+    transition:
+      background-color 350ms var(--ease-padrao),
+      transform 350ms var(--ease-assinatura);
+    transition-delay: calc(var(--d) * 9ms + 250ms);
+  }
+  :global(.js:not(.motion-fallback)) .dias:not(:global(.is-in)) .ponto {
+    background: var(--color-border);
+    transform: scale(0.65);
+  }
+  .dias figcaption { margin-top: var(--space-5); padding-top: var(--space-4); border-top: var(--border-width) solid var(--color-border); color: var(--color-text-muted); }
+  .dias figcaption strong { color: var(--color-text); }
+
+  /* Casos */
+  .cards { display: grid; gap: var(--space-4); }
+  .card { padding: var(--space-5); background: var(--color-surface); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); }
+  .card h4 { margin: var(--space-3) 0 var(--space-2); font-size: var(--text-h3); }
+  .card p { margin: 0; color: var(--color-text-muted); }
+  .card :global(.card__icon) { color: var(--color-accent); }
+
+  /* Carência */
+  .carencia { display: grid; gap: var(--space-4); }
+  .carencia__col { padding: var(--space-5); background: var(--color-surface); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); }
+  .carencia__num { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 3.5rem; line-height: 1; color: var(--color-accent); }
+  .carencia__col h4 { margin: var(--space-2) 0 var(--space-4); font-size: var(--text-h3); }
+  .carencia__col ul { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+  .carencia__col li { display: flex; align-items: flex-start; gap: var(--space-3); }
+  .carencia__col li :global(svg) { flex: none; margin-top: 3px; color: var(--sucesso-700); }
+  .carencia__col:not(.carencia__col--zero) li :global(svg) { color: var(--color-accent); }
+  .carencia__col--zero { border-color: var(--sucesso-700); }
+  .mat__nota { margin: var(--space-5) 0 0; color: var(--color-text-muted); }
+
+  @media (min-width: 48em) {
+    .dias__meses { grid-template-columns: repeat(4, 1fr); }
+    .cards { grid-template-columns: repeat(3, 1fr); }
+    .carencia { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ponto { transition: none; }
+    :global(.js:not(.motion-fallback)) .dias:not(:global(.is-in)) .ponto { background: var(--color-accent); transform: none; }
+  }
+</style>

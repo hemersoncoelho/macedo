@@ -1,0 +1,125 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import Hero from "../components/sections/Hero.astro";
+import WhatsAppButton from "../components/ui/WhatsAppButton.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import ServiceCard from "../components/ui/ServiceCard.astro";
+import Steps from "../components/ui/Steps.astro";
+import Accordion from "../components/ui/Accordion.astro";
+import AntiScamNotice from "../components/ui/AntiScamNotice.astro";
+import CtaFinal from "../components/sections/CtaFinal.astro";
+import Button from "../components/ui/Button.astro";
+import Icon from "../components/ui/Icon.astro";
+import { beneficios, beneficioUrl } from "../data/beneficios";
+
+const WHATSAPP_MENSAGEM = "Olá! Gostaria de saber se tenho direito a um benefício do INSS.";
+
+const passos = [
+  { title: "Você chama no WhatsApp", text: "Conta a sua situação com as suas palavras. Sem formulário e sem complicação." },
+  { title: "Analisamos o seu caso", text: "Conferimos documentos, requisitos e prazos e explicamos, em linguagem simples, o que dá para fazer." },
+  { title: "Cuidamos do pedido", text: "Fazemos o pedido no INSS ou o recurso e acompanhamos o andamento." },
+];
+
+const perguntas = [
+  {
+    pergunta: "Como sei se tenho direito a um benefício do INSS?",
+    resposta:
+      "Depende do benefício: cada um tem requisitos próprios, como idade, tempo de contribuição, renda da família ou incapacidade para o trabalho. Conte o seu caso pelo WhatsApp e a gente indica o caminho.",
+  },
+  {
+    pergunta: "Preciso ir ao escritório?",
+    resposta: "Não necessariamente. O primeiro contato pode ser todo pelo WhatsApp. Se preferir, também atendemos presencialmente.",
+  },
+  {
+    pergunta: "Meu pedido foi negado pelo INSS. Posso tentar de novo?",
+    resposta:
+      "Em muitos casos, sim. Dependendo do motivo, dá para recorrer no INSS ou entrar com uma ação na Justiça. Guarde a carta do INSS e os documentos que você tiver.",
+  },
+  {
+    pergunta: "Quais documentos devo separar?",
+    resposta:
+      "Documento com foto, CPF, carteira de trabalho e os comprovantes do seu caso. Mas não precisa ter tudo para começar: a gente diz o que falta.",
+  },
+];
+---
+
+<Layout
+  title="Macedo Neto | Advocacia Especializada — INSS e Direito Previdenciário"
+  description="Benefício do INSS negado ou não sabe se tem direito? Orientação em aposentadoria, BPC/LOAS, pensão por morte, salário-maternidade e auxílio-doença, em linguagem simples."
+>
+  <SiteHeader />
+  <main id="conteudo">
+    <Hero />
+
+    <!-- Como podemos ajudar: um cartão por benefício + saída para quem não sabe o seu caso -->
+    <section class="section" id="previdenciario">
+      <div class="container">
+        <SectionHeading
+          overline="Direito Previdenciário"
+          title="Como podemos ajudar"
+          lead="Escolha o benefício que mais parece com a sua situação. Em cada página você vê quem tem direito e o que fazer."
+        />
+        <div class="grid bloco" style="--grid-min: 19rem" data-reveal-group>
+          {beneficios.map((b) => (
+            <ServiceCard href={beneficioUrl(b.slug)} icon={b.icon} title={b.nome} question={b.pergunta} slug={b.slug} />
+          ))}
+          <div class="duvida tone-dark" data-reveal>
+            <Icon name="message" size={32} />
+            <p>Não sabe qual é o seu caso?</p>
+            <WhatsAppButton message={WHATSAPP_MENSAGEM} label="Conte para a gente" />
+          </div>
+        </div>
+        <div class="bloco"><Button href="/previdenciario" variant="secondary">Ver todos os benefícios lado a lado</Button></div>
+      </div>
+    </section>
+
+    <!-- Como funciona -->
+    <section class="section section--alt" id="como-funciona">
+      <div class="container">
+        <SectionHeading overline="Passo a passo" title="Como funciona" lead="É simples, e começa pelo WhatsApp." />
+        <div class="bloco"><Steps steps={passos} /></div>
+        <div class="bloco"><WhatsAppButton message={WHATSAPP_MENSAGEM} label="Começar pelo WhatsApp" /></div>
+      </div>
+    </section>
+
+    <!-- Dúvidas -->
+    <section class="section" id="duvidas">
+      <div class="container">
+        <SectionHeading overline="Dúvidas comuns" title="Perguntas frequentes" />
+        <div class="bloco"><Accordion items={perguntas} name="faq-home" /></div>
+        <div class="bloco"><AntiScamNotice /></div>
+      </div>
+    </section>
+
+    <CtaFinal
+      linhas={["Conte o seu caso.", "A gente explica o caminho."]}
+      texto="Mande uma mensagem pelo WhatsApp. Atendimento também presencial."
+      mensagem={WHATSAPP_MENSAGEM}
+    />
+  </main>
+  <SiteFooter />
+  <WhatsAppButton variant="floating" />
+</Layout>
+
+<style>
+  section[id] { scroll-margin-top: 5rem; }
+  .bloco { margin-top: var(--space-7); }
+  .section--alt { background: var(--color-surface); }
+
+  /* Sexto cartão: saída para quem não sabe qual benefício procurar */
+  .duvida {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--space-4);
+    height: 100%;
+    padding: var(--space-6) var(--space-5);
+    background: var(--grafite-950);
+    border: var(--border-width) solid var(--grafite-800);
+    border-radius: var(--radius-md);
+  }
+  .duvida p { margin: 0; font-family: var(--font-display); font-size: var(--text-h3); font-weight: 600; color: var(--branco); }
+  .duvida :global(svg) { color: var(--madeira-400); }
+</style>

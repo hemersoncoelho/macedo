@@ -1,0 +1,100 @@
+---
+/**
+ * Header fixo, tom escuro. Ao rolar 80px ([data-compact], via motion.ts):
+ * reduz a altura e o logotipo completo vira só o monograma.
+ * Menu mobile com <details> nativo (teclado + leitor de tela sem JS).
+ */
+import Monogram from "../ui/Monogram.astro";
+import WhatsAppButton from "../ui/WhatsAppButton.astro";
+import { site } from "../../data/site";
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+interface Props {
+  nav?: NavItem[];
+}
+
+const {
+  nav = [
+    // PENDENTE: voltar "Áreas", "O escritório" e "Equipe" quando essas seções existirem.
+    { label: "Previdenciário", href: "/previdenciario" },
+    { label: "Como funciona", href: "/#como-funciona" },
+    { label: "Dúvidas", href: "/#duvidas" },
+    { label: "Contato", href: "#contato" },
+  ],
+} = Astro.props;
+---
+
+<header class="hd tone-dark" data-site-header style="view-transition-name: site-header">
+  <div class="container hd__inner">
+    <a class="hd__brand" href="/" aria-label={`${site.nome} — ${site.descritor}, página inicial`}>
+      <Monogram size={40} />
+      <span class="hd__wordmark" aria-hidden="true">
+        <span class="hd__name">MACEDO NETO</span>
+        <span class="hd__desc">ADVOCACIA ESPECIALIZADA</span>
+      </span>
+    </a>
+
+    <nav class="hd__nav" aria-label="Principal">
+      <ul>{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+    </nav>
+
+    <div class="hd__cta"><WhatsAppButton label="WhatsApp" /></div>
+
+    <details class="hd__menu">
+      <summary aria-label="Abrir menu">Menu</summary>
+      <nav aria-label="Principal (celular)">
+        <ul>{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .hd {
+    position: sticky; top: 0; z-index: var(--z-header);
+    background: rgb(17 18 20 / 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+  .hd__inner {
+    display: flex; align-items: center; gap: var(--space-5);
+    min-height: 5.5rem;
+    transition: min-height var(--dur-base) var(--ease-padrao);
+  }
+  .hd[data-compact] .hd__inner { min-height: 4rem; }
+
+  .hd__brand { display: flex; align-items: center; gap: var(--space-3); color: var(--prata-300); text-decoration: none; }
+  .hd__wordmark { display: grid; transition: opacity var(--dur-base) var(--ease-padrao); }
+  .hd[data-compact] .hd__wordmark { opacity: 0; pointer-events: none; }
+  .hd__name { font-family: var(--font-display); font-weight: 600; font-size: 1.125rem; letter-spacing: 0.08em; }
+  .hd__desc { font-family: var(--font-display); font-size: 0.625rem; letter-spacing: var(--tracking-overline); color: var(--prata-500); }
+
+  .hd__nav { margin-left: auto; display: none; }
+  .hd ul { display: flex; gap: var(--space-5); margin: 0; padding: 0; list-style: none; }
+  .hd nav a {
+    display: inline-flex; align-items: center; min-height: var(--target-min);
+    color: var(--color-text); text-decoration: none; font-size: var(--text-small);
+    background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+    transition: background-size var(--dur-fast) var(--ease-assinatura), color var(--dur-fast) var(--ease-padrao);
+  }
+  .hd nav a:hover { color: var(--color-accent); background-size: 100% 1px; }
+  .hd__cta { display: none; }
+
+  .hd__menu { margin-left: auto; }
+  .hd__menu summary {
+    display: inline-flex; align-items: center; min-height: var(--target-min); padding-inline: var(--space-4);
+    border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md);
+    font-family: var(--font-display); font-weight: 600; cursor: pointer; list-style: none;
+  }
+  .hd__menu summary::-webkit-details-marker { display: none; }
+  .hd__menu nav { position: absolute; left: 0; right: 0; top: 100%; padding: var(--space-5) var(--gutter); background: var(--grafite-950); border-bottom: var(--border-width) solid var(--color-border); }
+  .hd__menu ul { flex-direction: column; gap: 0; }
+
+  @media (min-width: 60em) {
+    .hd__nav, .hd__cta { display: block; }
+    .hd__menu { display: none; }
+  }
+</style>

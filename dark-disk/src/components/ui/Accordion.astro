@@ -1,0 +1,65 @@
+---
+/**
+ * FAQ com <details>/<summary> nativo: teclado, leitor de tela e estado
+ * aberto/fechado sem JS. Animação de altura só onde há suporte
+ * (::details-content + interpolate-size), como melhoria progressiva.
+ */
+interface Item {
+  pergunta: string;
+  resposta: string;
+}
+interface Props {
+  items: Item[];
+  name?: string;
+}
+const { items, name = "faq" } = Astro.props;
+---
+
+<div class="acc" data-reveal>
+  {items.map((item) => (
+    <details class="acc__item" name={name}>
+      <summary class="acc__q">
+        <span>{item.pergunta}</span>
+        <span class="acc__icon" aria-hidden="true"></span>
+      </summary>
+      <div class="acc__a"><p>{item.resposta}</p></div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .acc { border-top: var(--border-width) solid var(--color-border); }
+  .acc__item { border-bottom: var(--border-width) solid var(--color-border); }
+  .acc__q {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    min-height: var(--target-min);
+    padding: var(--space-5) 0;
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-body);
+    cursor: pointer;
+    list-style: none;
+  }
+  .acc__q::-webkit-details-marker { display: none; }
+  .acc__q:hover { color: var(--color-accent); }
+  .acc__icon { position: relative; flex: none; width: 1.25rem; height: 1.25rem; color: var(--color-accent); }
+  .acc__icon::before, .acc__icon::after {
+    content: ""; position: absolute; inset: 50% 0 auto; height: 1.5px; background: currentColor;
+    transition: transform var(--dur-base) var(--ease-assinatura);
+  }
+  .acc__icon::after { transform: rotate(90deg); }
+  .acc__item[open] .acc__icon::before { transform: rotate(45deg); }
+  .acc__item[open] .acc__icon::after { transform: rotate(135deg); }
+  .acc__a { padding-bottom: var(--space-5); color: var(--color-text-muted); }
+
+  @supports (interpolate-size: allow-keywords) {
+    .acc { interpolate-size: allow-keywords; }
+    .acc__item::details-content {
+      block-size: 0; overflow: hidden;
+      transition: block-size var(--dur-base) var(--ease-padrao), content-visibility var(--dur-base) allow-discrete;
+    }
+    .acc__item[open]::details-content { block-size: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .acc__icon::before, .acc__icon::after { transition: none; }
+    .acc__item::details-content { transition: none; }
+  }
+</style>

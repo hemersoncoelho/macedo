@@ -1,0 +1,254 @@
+---
+/**
+ * Hub Previdenciário (/previdenciario): organiza os benefícios pela SITUAÇÃO de quem chega
+ * (a pessoa conhece o problema, não o nome do benefício).
+ * 1) Guia por situação: fio vertical + marcos (linguagem da trilha do auxílio-doença).
+ *    O nome do benefício leva view-transition-name (M8: vira o H1 da página dele; único por página).
+ * 2) "Precisa ter contribuído?": dois painéis (sim × não) — a primeira dúvida de todo mundo.
+ * Conteúdo vem de src/data/beneficios.ts. ⚠ Notas do comparador a validar com o escritório.
+ */
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import SiteFooter from "../../components/layout/SiteFooter.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import AntiScamNotice from "../../components/ui/AntiScamNotice.astro";
+import WhatsAppButton from "../../components/ui/WhatsAppButton.astro";
+import CtaFinal from "../../components/sections/CtaFinal.astro";
+import Icon from "../../components/ui/Icon.astro";
+import { beneficios, beneficioUrl } from "../../data/beneficios";
+
+const WHATSAPP_MENSAGEM = "Olá! Gostaria de saber qual benefício do INSS combina com a minha situação.";
+
+/** Notas do comparador "precisa ter contribuído?" (por slug). */
+const notas: Record<string, string> = {
+  aposentadoria: "Idade mínima e tempo de contribuição.",
+  "pensao-por-morte": "A pessoa que faleceu precisava ser segurada do INSS.",
+  "salario-maternidade": "Carência de 10 meses para parte dos casos.",
+  "auxilio-doenca": "12 contribuições, em regra.",
+  "bpc-loas": "Para pessoa idosa ou com deficiência, com renda baixa na família.",
+};
+const SEM_CONTRIBUICAO = ["bpc-loas"];
+const comContribuicao = beneficios.filter((b) => !SEM_CONTRIBUICAO.includes(b.slug));
+const semContribuicao = beneficios.filter((b) => SEM_CONTRIBUICAO.includes(b.slug));
+---
+
+<Layout
+  title="Benefícios do INSS: aposentadoria, pensão, BPC e mais | Macedo Neto Advocacia"
+  description="Aposentadoria, pensão por morte, salário-maternidade, auxílio-doença e BPC/LOAS: escolha pela sua situação, veja quem tem direito e o que fazer. Explicação em linguagem simples."
+>
+  <SiteHeader />
+
+  <main id="conteudo">
+    <!-- Topo -->
+    <section class="topo tone-dark bg-marmore" aria-labelledby="titulo">
+      <div class="container">
+        <nav class="trilha" aria-label="Você está em">
+          <ol>
+            <li><a href="/">Início</a></li>
+            <li aria-current="page">Previdenciário</li>
+          </ol>
+        </nav>
+        <p class="overline" data-reveal>Direito Previdenciário · INSS</p>
+        <h1 id="titulo" class="topo__titulo" data-reveal-mask>
+          <span class="mask-line"><span style="--i:0">Benefícios</span></span>
+          <span class="mask-line"><span style="--i:1">do INSS</span></span>
+        </h1>
+        <p class="lead topo__lead" data-reveal style="--i:2">
+          Cada situação tem um benefício. Comece pela sua e veja quem tem direito, os documentos e o que fazer.
+        </p>
+        <div class="topo__acoes" data-reveal style="--i:3">
+          <WhatsAppButton message={WHATSAPP_MENSAGEM} label="Não sei qual é o meu" />
+          <a class="topo__link" href="#situacoes">Ver as situações <Icon name="arrow-right" size={20} /></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Guia por situação -->
+    <section class="section" id="situacoes">
+      <div class="container situacoes">
+        <div class="situacoes__intro">
+          <SectionHeading
+            overline="Por onde começar"
+            title="Qual é a sua situação?"
+            lead="Você não precisa saber o nome do benefício. Escolha a frase que mais parece com o seu caso."
+          />
+        </div>
+        <ol class="guia" data-draw data-reveal-group>
+          {beneficios.map((b) => (
+            <li class="passo" data-reveal>
+              <span class="passo__no" aria-hidden="true"><Icon name={b.icon} size={22} /></span>
+              <a class="passo__link" href={beneficioUrl(b.slug)}>
+                <span class="passo__pergunta">{b.pergunta}</span>
+                <span class="passo__resumo">{b.resumo}</span>
+                <span class="passo__rodape">
+                  <span class="passo__nome" style={`view-transition-name: servico-${b.slug}; view-transition-class: servico`}>{b.nome}</span>
+                  <span class="passo__mais">Ver benefício <Icon name="arrow-right" size={18} /></span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- 2. Precisa ter contribuído? -->
+    <section class="section section--alt" id="contribuicao">
+      <div class="container">
+        <SectionHeading
+          overline="Em uma olhada"
+          title="Precisa ter contribuído para o INSS?"
+          lead="É a primeira diferença entre os benefícios."
+        />
+        <div class="paineis" data-reveal-group>
+          <article class="painel" data-reveal>
+            <h3><Icon name="check" size={24} /> Sim: conta o que foi contribuído</h3>
+            <ul>
+              {comContribuicao.map((b) => (
+                <li>
+                  <a href={beneficioUrl(b.slug)}>{b.nome}</a>
+                  <span>{notas[b.slug]}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article class="painel painel--nao tone-dark" data-reveal>
+            <h3><Icon name="home" size={24} /> Não: conta a renda da família</h3>
+            <ul>
+              {semContribuicao.map((b) => (
+                <li>
+                  <a href={beneficioUrl(b.slug)}>{b.nome}</a>
+                  <span>{notas[b.slug]}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container"><AntiScamNotice /></div>
+    </section>
+
+    <CtaFinal
+      linhas={["Ainda na dúvida?", "A gente ajuda a escolher."]}
+      texto="Conte a sua situação pelo WhatsApp e a gente indica o benefício e o caminho. Atendimento também presencial."
+      mensagem={WHATSAPP_MENSAGEM}
+    />
+  </main>
+
+  <SiteFooter />
+  <WhatsAppButton variant="floating" message={WHATSAPP_MENSAGEM} />
+</Layout>
+
+<style>
+  section[id] { scroll-margin-top: 5rem; }
+  .section--alt { background: var(--color-surface); }
+
+  /* Topo */
+  .topo { padding-block: var(--space-6) var(--space-8); }
+  .trilha ol {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);
+    margin: 0 0 var(--space-7); padding: 0; list-style: none;
+    font-size: var(--text-small); color: var(--color-text-muted);
+  }
+  .trilha li + li::before { content: "›"; margin-right: var(--space-2); }
+  .trilha a { color: inherit; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  .trilha a:hover { color: var(--color-accent); }
+  .topo__titulo {
+    margin-block: var(--space-3) var(--space-5);
+    font-size: clamp(2.75rem, 1.6rem + 6vw, 6rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    color: var(--branco);
+  }
+  .topo__lead { max-width: 48ch; }
+  .topo__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); margin-top: var(--space-6); }
+  .topo__link {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--target-min);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-small);
+    color: var(--color-accent); text-decoration: none;
+  }
+  .topo__link:hover { color: var(--color-accent-hover); }
+
+  /* Guia por situação: fio vertical + marcos */
+  .situacoes { display: grid; gap: var(--space-7); }
+  .guia { position: relative; display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  .guia::before {
+    content: "";
+    position: absolute; left: 1.5rem; top: 1.5rem; bottom: 1.5rem;
+    width: 2px; translate: -1px 0;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: transform 1500ms var(--ease-assinatura) 200ms;
+  }
+  :global(.js:not(.motion-fallback)) .guia:not(:global(.is-in))::before { transform: scaleY(0); }
+
+  .passo { display: grid; grid-template-columns: 3rem 1fr; gap: var(--space-4); align-items: start; }
+  .passo__no {
+    position: relative; z-index: 1;
+    display: grid; place-items: center;
+    width: 3rem; height: 3rem;
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-accent);
+    transition: background-color var(--dur-fast) var(--ease-padrao), color var(--dur-fast) var(--ease-padrao);
+  }
+  .passo:hover .passo__no, .passo:focus-within .passo__no { background: var(--color-accent); color: var(--color-on-accent); }
+
+  .passo__link {
+    display: grid; gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      transform var(--dur-fast) var(--ease-assinatura),
+      border-color var(--dur-fast) var(--ease-padrao),
+      box-shadow var(--dur-fast) var(--ease-padrao);
+  }
+  .passo__link:hover { border-color: var(--color-accent); box-shadow: var(--shadow-lift); transform: translateX(var(--move-sm)); color: var(--color-text); }
+  .passo__pergunta { font-family: var(--font-display); font-weight: 600; font-size: var(--text-h3); line-height: 1.2; }
+  .passo__resumo { color: var(--color-text-muted); }
+  .passo__rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-4); margin-top: var(--space-2); }
+  .passo__nome { display: inline-block; font-family: var(--font-display); font-weight: 600; font-size: var(--text-small); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent); }
+  .passo__mais { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-size: var(--text-small); font-weight: 600; color: var(--color-text); }
+  .passo__mais :global(svg) { transition: transform var(--dur-fast) var(--ease-assinatura); }
+  .passo__link:hover .passo__mais :global(svg) { transform: translateX(var(--move-sm)); }
+
+  /* Painéis sim × não */
+  .paineis { display: grid; gap: var(--space-4); margin-top: var(--space-7); }
+  .painel {
+    padding: var(--space-6) var(--space-5);
+    background: var(--color-bg);
+    border: var(--border-width) solid var(--color-border);
+    border-top: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .painel--nao { background: var(--grafite-950); border-color: var(--grafite-800); border-top-color: var(--madeira-400); }
+  .painel h3 { display: flex; align-items: center; gap: var(--space-3); margin: 0 0 var(--space-5); font-size: var(--text-h3); }
+  .painel h3 :global(svg) { flex: none; color: var(--color-accent); }
+  .painel ul { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+  .painel li { display: grid; }
+  /* alvo ≥ 48px (regra do público), sem mudar o visual do texto */
+  .painel li a { justify-self: start; display: inline-flex; align-items: center; min-height: var(--target-min); font-family: var(--font-display); font-weight: 600; color: var(--color-text); text-decoration: underline; text-underline-offset: 0.2em; }
+  .painel li a:hover { color: var(--color-accent); }
+  .painel li span { color: var(--color-text-muted); }
+  .painel--nao h3, .painel--nao li a { color: var(--branco); }
+
+  @media (min-width: 60em) {
+    .situacoes { grid-template-columns: 1fr 1.7fr; gap: var(--space-8); align-items: start; }
+    .situacoes__intro { position: sticky; top: 7rem; }
+    .paineis { grid-template-columns: 2fr 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .guia::before { transition: none; }
+    :global(.js:not(.motion-fallback)) .guia:not(:global(.is-in))::before { transform: none; }
+    .passo__link:hover, .passo__link:hover .passo__mais :global(svg) { transform: none; }
+  }
+</style>

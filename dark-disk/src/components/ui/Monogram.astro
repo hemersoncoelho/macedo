@@ -1,0 +1,54 @@
+---
+/**
+ * M1 — Monograma MN. ⚠ PLACEHOLDER geométrico até receber o logo em vetor (SVG).
+ * Com `animate`, o traço se desenha uma vez por sessão (classe .intro-seen no <html>).
+ */
+interface Props {
+  size?: number;
+  animate?: boolean;
+  label?: string;
+  class?: string;
+}
+const { size = 48, animate = false, label, class: className } = Astro.props;
+---
+
+<svg
+  class:list={["monogram", className]}
+  data-animate={animate ? "" : undefined}
+  width={size}
+  height={size}
+  viewBox="0 0 100 100"
+  fill="none"
+  role={label ? "img" : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : "true"}
+  focusable="false"
+>
+  <path d="M14 88V12l36 48 36-48v76" pathLength="1" />
+  <path d="M32 88V44l36 44V44" pathLength="1" />
+</svg>
+
+<style>
+  .monogram { color: var(--prata-300); }
+  .monogram path {
+    stroke: currentColor;
+    stroke-width: 5;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  :global(.js:not(.intro-seen):not(.motion-fallback)) .monogram[data-animate] path {
+    animation: monogram-draw var(--dur-signature) var(--ease-assinatura) 200ms both;
+  }
+  :global(.js:not(.intro-seen):not(.motion-fallback)) .monogram[data-animate] path + path {
+    animation-delay: 500ms;
+  }
+  @keyframes monogram-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .monogram[data-animate] path { animation: none !important; }
+  }
+</style>

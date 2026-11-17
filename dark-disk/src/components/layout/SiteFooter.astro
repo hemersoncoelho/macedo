@@ -1,0 +1,47 @@
+---
+import Monogram from "../ui/Monogram.astro";
+import AntiScamNotice from "../ui/AntiScamNotice.astro";
+import { site } from "../../data/site";
+
+const ano = new Date().getFullYear();
+---
+
+<footer class="ft tone-dark" id="contato">
+  <div class="container ft__grid">
+    <div class="ft__brand">
+      <Monogram size={56} />
+      <p class="ft__name">MACEDO NETO</p>
+      <p class="overline">Advocacia Especializada</p>
+    </div>
+
+    <div>
+      <h2 class="ft__h">Equipe</h2>
+      <ul class="ft__list">
+        {site.advogados.map((adv) => <li>{adv.nome}<br /><span class="muted small">{adv.oab}</span></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="ft__h">Endereço</h2>
+      <p class="muted">{site.endereco}</p>
+      <p><a href={site.instagram} target="_blank" rel="noopener noreferrer">Instagram @advocaciamacedoneto</a></p>
+    </div>
+
+    <div class="ft__notice"><AntiScamNotice compact /></div>
+  </div>
+  <div class="container ft__legal small muted">
+    <p>© {ano} {site.nome} · {site.descritor}. CNPJ: PENDENTE.</p>
+    <p>Conteúdo informativo, conforme o Provimento 205/2021 da OAB.</p>
+  </div>
+</footer>
+
+<style>
+  .ft { padding-block: var(--space-9) var(--space-6); background: var(--color-bg); color: var(--color-text); }
+  .ft__grid { display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+  .ft__brand { display: grid; gap: var(--space-2); justify-items: start; }
+  .ft__name { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.08em; }
+  .ft__h { font-size: var(--text-small); letter-spacing: var(--tracking-overline); text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--space-4); }
+  .ft__list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+  .ft__notice { grid-column: 1 / -1; }
+  .ft__legal { display: grid; gap: var(--space-2); margin-top: var(--space-8); padding-top: var(--space-5); border-top: var(--border-width) solid var(--color-border); }
+</style>

@@ -1,0 +1,65 @@
+---
+/**
+ * Card de serviço: ícone + pergunta orientadora + título.
+ * Card inteiro clicável. `slug` gera view-transition-name para o M8
+ * (o título do card "vira" o H1 da página do benefício).
+ */
+import Icon, { type IconName } from "./Icon.astro";
+
+interface Props {
+  href: string;
+  icon: IconName;
+  title: string;
+  question: string;
+  slug: string;
+}
+
+const { href, icon, title, question, slug } = Astro.props;
+---
+
+<div class="sc-wrap" data-reveal>
+  <a class="sc" href={href}>
+    <Icon name={icon} size={32} class="sc__icon" />
+    <p class="sc__question">{question}</p>
+    <h3 class="sc__title" style={`view-transition-name: servico-${slug}; view-transition-class: servico`}>{title}</h3>
+    <span class="sc__more">
+      Saiba mais <Icon name="arrow-right" size={18} class="sc__arrow" />
+    </span>
+  </a>
+</div>
+
+<style>
+  .sc-wrap { height: 100%; }
+  .sc {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    height: 100%;
+    padding: var(--space-6) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      transform var(--dur-fast) var(--ease-assinatura),
+      border-color var(--dur-fast) var(--ease-padrao),
+      box-shadow var(--dur-fast) var(--ease-padrao);
+  }
+  .sc:hover { border-color: var(--color-accent); box-shadow: var(--shadow-lift); transform: translateY(-2px); color: var(--color-text); }
+  .sc__icon { color: var(--color-accent); }
+  .sc__question { color: var(--color-text-muted); font-size: var(--text-small); }
+  .sc__title { font-size: var(--text-h3); }
+  .sc__more {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    margin-top: var(--space-3);
+    color: var(--color-accent);
+    font-family: var(--font-display); font-size: var(--text-small); font-weight: 600;
+  }
+  .sc__arrow { transition: transform var(--dur-fast) var(--ease-assinatura); }
+  .sc:hover .sc__arrow { transform: translateX(var(--move-sm)); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sc:hover, .sc:hover .sc__arrow { transform: none; }
+  }
+</style>

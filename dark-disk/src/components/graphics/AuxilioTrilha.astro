@@ -1,0 +1,142 @@
+---
+/**
+ * Gráfico "Quem tem direito ao auxílio-doença": 3 requisitos + trilha vertical do dia 1
+ * à perícia (o fio desce e cada marco aparece em cascata, M7) + os 3 desfechos da perícia.
+ * O conteúdo é HTML real; o fio é decorativo.
+ * ⚠ Textos a validar pelo escritório antes da publicação.
+ */
+import Icon, { type IconName } from "../ui/Icon.astro";
+
+interface Bloco {
+  icon: IconName;
+  titulo: string;
+  texto: string;
+}
+
+const requisitos: Bloco[] = [
+  { icon: "shield", titulo: "Ser segurado do INSS", texto: "Estar contribuindo ou ainda protegido depois de parar de contribuir." },
+  { icon: "file", titulo: "Carência de 12 contribuições", texto: "Em regra. Em caso de acidente e de algumas doenças graves previstas em lei, não é exigida." },
+  { icon: "check", titulo: "Estar sem condições de trabalhar", texto: "Por doença ou acidente, por mais de 15 dias, comprovado na perícia do INSS." },
+];
+
+const etapas: { dia: string; titulo: string; texto: string }[] = [
+  { dia: "Dia 1", titulo: "Você fica sem condições de trabalhar", texto: "Por doença ou acidente. Guarde atestados, laudos, exames e receitas desde o começo." },
+  { dia: "Até o 15º dia", titulo: "Empregado: a empresa paga", texto: "Quem tem carteira assinada recebe da empresa nos primeiros 15 dias. Autônomos e contribuintes individuais pedem ao INSS desde o início." },
+  { dia: "A partir do 16º dia", titulo: "Pedido ao INSS", texto: "Pelo Meu INSS ou pelo telefone 135, com os atestados e laudos. Pedir em até 30 dias do afastamento evita perder parcelas." },
+  { dia: "Perícia", titulo: "Perícia médica", texto: "O perito do INSS avalia se a incapacidade é real e por quanto tempo deve durar." },
+];
+
+const desfechos: Bloco[] = [
+  { icon: "check", titulo: "Benefício concedido", texto: "Você recebe enquanto durar a incapacidade e, se ainda não puder voltar, pode pedir prorrogação." },
+  { icon: "user", titulo: "Reabilitação profissional", texto: "Se não puder voltar à mesma função, o INSS pode indicar um curso ou uma nova atividade." },
+  { icon: "shield", titulo: "Aposentadoria por incapacidade", texto: "Sem possibilidade de recuperação, o benefício pode virar aposentadoria por incapacidade permanente." },
+];
+---
+
+<div class="aux">
+  <section aria-labelledby="aux-req">
+    <h3 id="aux-req" class="aux__titulo">O que o INSS exige</h3>
+    <div class="cards" data-reveal-group>
+      {requisitos.map((r) => (
+        <article class="card" data-reveal>
+          <Icon name={r.icon} size={28} class="card__icon" />
+          <h4>{r.titulo}</h4>
+          <p>{r.texto}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section aria-labelledby="aux-trilha">
+    <h3 id="aux-trilha" class="aux__titulo">Do afastamento à perícia</h3>
+    <ol class="trilha" data-draw data-reveal-group>
+      {etapas.map((e) => (
+        <li class="etapa" data-reveal>
+          <span class="etapa__dia">{e.dia}</span>
+          <h4>{e.titulo}</h4>
+          <p>{e.texto}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section aria-labelledby="aux-resultado">
+    <h3 id="aux-resultado" class="aux__titulo">O que a perícia pode decidir</h3>
+    <div class="cards" data-reveal-group>
+      {desfechos.map((d) => (
+        <article class="card card--escuro" data-reveal>
+          <Icon name={d.icon} size={28} class="card__icon" />
+          <h4>{d.titulo}</h4>
+          <p>{d.texto}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</div>
+
+<style>
+  .aux { display: grid; gap: var(--space-8); }
+  .aux__titulo { margin: 0 0 var(--space-5); font-size: var(--text-h3); }
+
+  .cards { display: grid; gap: var(--space-4); }
+  .card {
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-top: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .card h4 { margin: var(--space-3) 0 var(--space-2); font-size: var(--text-h3); }
+  .card p { margin: 0; color: var(--color-text-muted); }
+  .card :global(.card__icon) { color: var(--color-accent); }
+  .card--escuro { background: var(--grafite-950); border-color: var(--grafite-800); border-top-color: var(--madeira-400); }
+  .card--escuro h4 { color: var(--branco); }
+  .card--escuro p { color: var(--prata-300); }
+  .card--escuro :global(.card__icon) { color: var(--madeira-400); }
+
+  /* Trilha vertical: fio à esquerda, um marco por etapa */
+  .trilha {
+    position: relative;
+    display: grid; gap: var(--space-6);
+    max-width: 46rem;
+    margin: 0; padding: 0 0 0 var(--space-7);
+    list-style: none;
+  }
+  .trilha::before {
+    content: "";
+    position: absolute; left: 0.6875rem; top: 0.5rem; bottom: 0.5rem;
+    width: 2px;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: transform 1400ms var(--ease-assinatura) 200ms;
+  }
+  :global(.js:not(.motion-fallback)) .trilha:not(:global(.is-in))::before { transform: scaleY(0); }
+
+  .etapa { position: relative; }
+  .etapa::before {
+    content: "";
+    position: absolute; left: calc(-1 * var(--space-7) + 0.1875rem); top: 0.25rem;
+    width: 1.1875rem; height: 1.1875rem;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    background: var(--color-bg);
+  }
+  .etapa:last-child::before { background: var(--color-accent); }
+  .etapa__dia {
+    display: inline-block;
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-small);
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .etapa h4 { margin: var(--space-1) 0 var(--space-2); font-size: var(--text-h3); }
+  .etapa p { margin: 0; color: var(--color-text-muted); }
+
+  @media (min-width: 48em) {
+    .cards { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trilha::before { transition: none; }
+    :global(.js:not(.motion-fallback)) .trilha:not(:global(.is-in))::before { transform: none; }
+  }
+</style>

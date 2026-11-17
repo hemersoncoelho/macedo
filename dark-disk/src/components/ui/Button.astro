@@ -1,0 +1,64 @@
+---
+import Icon, { type IconName } from "./Icon.astro";
+
+type Variant = "primary" | "secondary" | "ghost";
+
+interface Props {
+  href?: string;
+  variant?: Variant;
+  icon?: IconName;
+  type?: "button" | "submit";
+  external?: boolean;
+  class?: string;
+}
+
+const { href, variant = "primary", icon = "arrow-right", type = "button", external = false, class: className } = Astro.props;
+const Tag = href ? "a" : "button";
+const linkAttrs = href
+  ? { href, ...(external ? { target: "_blank", rel: "noopener noreferrer" } : {}) }
+  : { type };
+---
+
+<Tag class:list={["btn", `btn--${variant}`, className]} {...linkAttrs}>
+  <span><slot /></span>
+  {icon && <Icon name={icon} size={20} class="btn__icon" />}
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: var(--target-min);
+    padding: var(--space-3) var(--space-5);
+    border: var(--border-width) solid transparent;
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-fast) var(--ease-padrao),
+      border-color var(--dur-fast) var(--ease-padrao),
+      color var(--dur-fast) var(--ease-padrao);
+  }
+  .btn__icon { transition: transform var(--dur-fast) var(--ease-assinatura); }
+  .btn:hover .btn__icon { transform: translateX(var(--move-sm)); }
+
+  .btn--primary { background: var(--color-accent); color: var(--color-on-accent); }
+  .btn--primary:hover { background: var(--color-accent-hover); color: var(--color-on-accent); }
+
+  .btn--secondary { border-color: currentColor; color: var(--color-text); background: transparent; }
+  .btn--secondary:hover { color: var(--color-accent); }
+
+  .btn--ghost { padding-inline: 0; color: var(--color-accent); background: transparent; }
+  .btn--ghost:hover { color: var(--color-accent-hover); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn:hover .btn__icon { transform: none; }
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+/** M4 — divisor com a diagonal do "N" do monograma; se risca ao entrar na tela. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg class:list={["divider", className]} data-draw width="160" height="12" viewBox="0 0 160 12" fill="none" aria-hidden="true" focusable="false">
+  <path d="M1 11 L11 1 H159" pathLength="1" />
+</svg>
+
+<style>
+  .divider { color: var(--color-accent); }
+  .divider path {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset var(--dur-slow) var(--ease-assinatura) 150ms;
+  }
+  :global(.js:not(.motion-fallback)) .divider:not(:global(.is-in)) path { stroke-dashoffset: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .divider path { transition: none; }
+    :global(.js:not(.motion-fallback)) .divider:not(:global(.is-in)) path { stroke-dashoffset: 0; }
+  }
+</style>

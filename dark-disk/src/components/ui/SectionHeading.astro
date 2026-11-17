@@ -1,0 +1,27 @@
+---
+import Divider from "./Divider.astro";
+
+interface Props {
+  overline?: string;
+  title: string;
+  lead?: string;
+  level?: "h1" | "h2";
+  align?: "start" | "center";
+}
+
+const { overline, title, lead, level = "h2", align = "start" } = Astro.props;
+const Heading = level;
+---
+
+<header class:list={["sh", `sh--${align}`]} data-reveal>
+  {overline && <p class="overline">{overline}</p>}
+  <Heading>{title}</Heading>
+  <Divider class="sh__divider" />
+  {lead && <p class="lead">{lead}</p>}
+</header>
+
+<style>
+  .sh { display: grid; gap: var(--space-4); margin-bottom: var(--space-7); max-width: 48rem; }
+  .sh--center { margin-inline: auto; text-align: center; justify-items: center; }
+  .sh--center .lead { margin-inline: auto; }
+</style>

@@ -1,0 +1,246 @@
+---
+/**
+ * Gráfico "Quem tem direito ao BPC/LOAS" — fluxo de requisitos.
+ * (idosa OU pessoa com deficiência) E renda baixa E CadÚnico → pode ter direito.
+ * Motion: cartões em cascata (M6) e fios revelados de cima para baixo (M7, [data-draw]).
+ * Conteúdo é HTML real (lido por leitor de tela na ordem); fios são decorativos.
+ * ⚠ Textos a validar pelo escritório antes da publicação.
+ */
+import Icon, { type IconName } from "../ui/Icon.astro";
+
+interface Requisito {
+  icon: IconName;
+  titulo: string;
+  texto: string;
+}
+
+const quem: Requisito[] = [
+  { icon: "user", titulo: "Pessoa idosa", texto: "Com 65 anos ou mais." },
+  {
+    icon: "heart",
+    titulo: "Pessoa com deficiência",
+    texto: "De qualquer idade, com impedimento de longo prazo (2 anos ou mais) que dificulta a vida no dia a dia.",
+  },
+];
+
+const condicoes: Requisito[] = [
+  { icon: "home", titulo: "Renda da família baixa", texto: "Em regra, até ¼ do salário mínimo por pessoa da casa." },
+  { icon: "file", titulo: "Cadastro no CadÚnico", texto: "A família precisa estar inscrita e com o cadastro atualizado." },
+];
+---
+
+<div class="req" data-draw>
+  <div class="req__linha" data-reveal-group>
+    <article class="req__card" data-reveal>
+      <Icon name={quem[0].icon} size={28} class="req__icon" />
+      <h3>{quem[0].titulo}</h3>
+      <p>{quem[0].texto}</p>
+    </article>
+    <p class="req__op" data-reveal>ou</p>
+    <article class="req__card" data-reveal>
+      <Icon name={quem[1].icon} size={28} class="req__icon" />
+      <h3>{quem[1].titulo}</h3>
+      <p>{quem[1].texto}</p>
+    </article>
+  </div>
+
+  <div class="req__fio" aria-hidden="true">
+    <span class="req__u"></span><span class="req__haste"></span>
+    <span class="req__rotulo">e também</span>
+  </div>
+
+  <div class="req__linha" data-reveal-group>
+    <article class="req__card" data-reveal>
+      <Icon name={condicoes[0].icon} size={28} class="req__icon" />
+      <h3>{condicoes[0].titulo}</h3>
+      <p>{condicoes[0].texto}</p>
+    </article>
+    <p class="req__op" data-reveal>e</p>
+    <article class="req__card" data-reveal>
+      <Icon name={condicoes[1].icon} size={28} class="req__icon" />
+      <h3>{condicoes[1].titulo}</h3>
+      <p>{condicoes[1].texto}</p>
+    </article>
+  </div>
+
+  <div class="req__fio req__fio--fim" aria-hidden="true">
+    <span class="req__u"></span><span class="req__haste"></span>
+  </div>
+
+  <p class="req__resultado" data-reveal>
+    <Icon name="check" size={24} />
+    <span>Pode ter direito ao BPC: <strong>um salário mínimo por mês</strong></span>
+  </p>
+
+  <!-- Ilustração da conta da renda por pessoa -->
+  <figure class="conta" data-reveal-group>
+    <figcaption class="overline">Como se calcula a renda por pessoa</figcaption>
+    <div class="conta__eq">
+      <div class="conta__termo" data-reveal>
+        <span class="conta__n" aria-hidden="true">R$</span>
+        <span>Soma da renda de quem mora na casa</span>
+      </div>
+      <span class="conta__op" data-reveal aria-label="dividido por">÷</span>
+      <div class="conta__termo" data-reveal>
+        <Icon name="users" size={28} class="conta__icon" />
+        <span>Número de pessoas da família</span>
+      </div>
+      <span class="conta__op" data-reveal aria-label="igual a">=</span>
+      <div class="conta__termo conta__termo--res" data-reveal>
+        <Icon name="user" size={28} class="conta__icon" />
+        <span>Renda por pessoa</span>
+      </div>
+    </div>
+  </figure>
+</div>
+
+<style>
+  .req { display: grid; justify-items: center; }
+
+  .req__linha {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    justify-items: center;
+  }
+  .req__card {
+    width: 100%;
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-top: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+  .req__card h3 { margin: var(--space-3) 0 var(--space-2); font-size: var(--text-h3); }
+  .req__card p { margin: 0; color: var(--color-text-muted); }
+  .req__card :global(.req__icon) { color: var(--color-accent); }
+
+  .req__op {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-small);
+    letter-spacing: var(--tracking-overline);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* Fio de ligação — celular: linha vertical; ≥48em: SVG convergindo */
+  .req__fio {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: var(--space-8);
+  }
+  .req__fio::before {
+    content: "";
+    position: absolute; inset: 0 auto 0 50%;
+    width: 2px; translate: -50% 0;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: transform 900ms var(--ease-assinatura) 300ms;
+  }
+  .req__fio--fim::before { transition-delay: 700ms; }
+  .req__u, .req__haste { display: none; }
+  .req__rotulo {
+    position: relative;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+
+  :global(.js:not(.motion-fallback)) .req:not(:global(.is-in)) .req__fio::before { transform: scaleY(0); }
+
+  .req__resultado {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-4) var(--space-5);
+    border-radius: 999px;
+    background: var(--grafite-950);
+    color: var(--prata-300);
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    text-align: left;
+  }
+  .req__resultado strong { color: var(--madeira-400); font-weight: 600; }
+  .req__resultado :global(svg) { flex: none; color: var(--madeira-400); }
+
+  /* Conta da renda */
+  .conta {
+    width: 100%;
+    margin: var(--space-8) 0 0;
+    padding: var(--space-5);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+  .conta figcaption { margin-bottom: var(--space-4); }
+  .conta__eq {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: center;
+  }
+  .conta__termo {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    max-width: 16rem;
+    font-weight: 600;
+  }
+  .conta__n {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.375rem;
+    color: var(--color-accent);
+    line-height: 28px;
+  }
+  .conta__termo :global(.conta__icon) { color: var(--color-accent); }
+  .conta__termo--res {
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-accent);
+  }
+  .conta__op {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 48em) {
+    .req__linha { grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-5); }
+    .req__card { height: 100%; }
+
+    .req__fio { height: var(--space-9); }
+    .req__fio::before { display: none; }
+    /* "U" ligando o centro dos dois cartões + haste central; revelados de cima para baixo */
+    .req__u, .req__haste {
+      display: block; position: absolute;
+      border-color: var(--color-accent); border-style: solid; border-width: 0;
+      transition: clip-path 900ms var(--ease-assinatura) 300ms;
+    }
+    .req__u {
+      top: 0; height: 50%; left: 25%; right: 25%;
+      border-width: 0 2px 2px; border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+    .req__haste { top: 50%; bottom: 0; left: 50%; border-left-width: 2px; translate: -1px 0; transition-delay: 1000ms; }
+    .req__fio--fim .req__u { transition-delay: 1200ms; }
+    .req__fio--fim .req__haste { transition-delay: 1800ms; }
+    :global(.js:not(.motion-fallback)) .req:not(:global(.is-in)) :is(.req__u, .req__haste) { clip-path: inset(0 0 100% 0); }
+
+    .conta__eq { grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .req__fio::before, .req__u, .req__haste { transition: none !important; }
+    :global(.js:not(.motion-fallback)) .req:not(:global(.is-in)) .req__fio::before { transform: none; }
+    :global(.js:not(.motion-fallback)) .req:not(:global(.is-in)) :is(.req__u, .req__haste) { clip-path: none; }
+  }
+</style>
