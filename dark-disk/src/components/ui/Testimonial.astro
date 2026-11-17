@@ -2,14 +2,14 @@
 /**
  * Depoimento. Usar SOMENTE com autorização escrita do cliente (LGPD) e após
  * decisão do escritório sobre o Provimento 205/2021 da OAB.
- * Nunca exibir o print bruto do WhatsApp; identificar só por iniciais.
+ * Nunca exibir o print bruto do WhatsApp; identificar só por iniciais (ou só pelo benefício).
  */
 interface Props {
   texto: string;
-  iniciais: string;
+  iniciais?: string;
   beneficio: string;
 }
-const { texto, iniciais, beneficio } = Astro.props;
+const { texto, iniciais = "Cliente", beneficio } = Astro.props;
 ---
 
 <figure class="tm" data-reveal>
@@ -17,7 +17,7 @@ const { texto, iniciais, beneficio } = Astro.props;
   <blockquote class="tm__text"><p>{texto}</p></blockquote>
   <figcaption class="tm__cite">
     <strong>{iniciais}</strong>
-    <span class="muted">· {beneficio}</span>
+    <span class="muted">&nbsp;· {beneficio}</span>
   </figcaption>
 </figure>
 

@@ -12,6 +12,9 @@ import AntiScamNotice from "../components/ui/AntiScamNotice.astro";
 import CtaFinal from "../components/sections/CtaFinal.astro";
 import Button from "../components/ui/Button.astro";
 import Icon from "../components/ui/Icon.astro";
+import Depoimentos from "../components/sections/Depoimentos.astro";
+import { Picture } from "astro:assets";
+import salaFoto from "../assets/photos/escritorio-sala.jpg";
 import { beneficios, beneficioUrl } from "../data/beneficios";
 
 const WHATSAPP_MENSAGEM = "Olá! Gostaria de saber se tenho direito a um benefício do INSS.";
@@ -84,6 +87,32 @@ const perguntas = [
       </div>
     </section>
 
+    <!-- O escritório (M2: foto entra por máscara + luz de LED na borda) -->
+    <section class="section" id="escritorio">
+      <div class="container escritorio">
+        <figure class="escritorio__foto led-frame" data-reveal-clip>
+          <Picture
+            src={salaFoto}
+            formats={["webp"]}
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 60em) 50vw, 100vw"
+            alt="Sala principal do escritório: estante de madeira, painel de mármore iluminado com o logo, mesa e duas poltronas."
+            loading="lazy"
+          />
+        </figure>
+        <div class="escritorio__texto">
+          <SectionHeading
+            overline="O escritório"
+            title="Se preferir, venha conversar pessoalmente"
+            lead="Além do WhatsApp, você pode ser atendido no escritório, em sala reservada, com tempo para explicar o seu caso."
+          />
+          <div data-reveal><Button href="/escritorio" variant="secondary">Conhecer o escritório</Button></div>
+        </div>
+      </div>
+    </section>
+
+    <Depoimentos alt />
+
     <!-- Dúvidas -->
     <section class="section" id="duvidas">
       <div class="container">
@@ -122,4 +151,13 @@ const perguntas = [
   }
   .duvida p { margin: 0; font-family: var(--font-display); font-size: var(--text-h3); font-weight: 600; color: var(--branco); }
   .duvida :global(svg) { color: var(--madeira-400); }
+
+  /* O escritório (chamada para /escritorio) */
+  .escritorio { display: grid; gap: var(--space-7); }
+  .escritorio__foto { margin: 0; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 5 / 4; background: var(--grafite-950); }
+  .escritorio__foto :global(picture), .escritorio__foto :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .escritorio__texto { display: grid; gap: var(--space-6); justify-items: start; }
+  @media (min-width: 60em) {
+    .escritorio { grid-template-columns: 1.1fr 1fr; gap: var(--space-8); align-items: center; }
+  }
 </style>

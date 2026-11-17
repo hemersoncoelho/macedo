@@ -17,6 +17,9 @@ export const site = {
   instagram: "https://www.instagram.com/advocaciamacedoneto/",
   // PENDENTE: endereço completo, cidade/UF, CNPJ, horário.
   endereco: "Nº 108C — endereço completo PENDENTE",
+  horario: "Horário de atendimento PENDENTE",
+  // Como reconhecer a fachada (tirado da foto; confirmar se mudar).
+  fachada: "Fachada preta com o letreiro de mármore “Macedo Neto”, número 108C.",
   advogados: [
     { nome: "Francimar Moura Macedo Neto", oab: "OAB/MA 31.307" },
     { nome: "Victor Felipe Teixeira", oab: "OAB/MA 31.375" },

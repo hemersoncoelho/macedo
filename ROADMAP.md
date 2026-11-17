@@ -14,9 +14,9 @@
 - ✅ "Como podemos ajudar" — `ServiceCard` ×5 + cartão "Não sabe qual é o seu caso?"
 - ✅ "Como funciona" — `Steps`, âncora `#como-funciona`
 - ⬜ "Outras áreas" — Bancário, Contratos, Trabalho, Notarial/Registral (⛔ lista final)
-- ⬜ "O escritório" — foto com `data-reveal-clip` + `.led-frame` (momento M2)
-- ⬜ "Equipe" — `LawyerCard` ×3 (⛔ fotos e bios)
-- ⬜ Prova social — avaliações do Google ou depoimentos (⛔ decisão OAB/LGPD)
+- ✅ "O escritório" — chamada na home (foto da sala com `data-reveal-clip` + `.led-frame`, M2) → página `/escritorio`
+- ✅ "Equipe" em `/escritorio#equipe` — `LawyerCard` ×3 com iniciais (⛔ retratos e bios)
+- ✅ Prova social — `sections/Depoimentos.astro` (home + `/escritorio`), 3 trechos sem nome em `data/depoimentos.ts` (⛔ **autorização escrita dos 3 clientes antes de publicar**)
 - ✅ FAQ — `Accordion` + `AntiScamNotice`
 - ✅ CTA final (LED + marca d'água) · ⬜ mapa (⛔ endereço)
 - ✅ Verificação visual (2026-11-16): home, hub e 5 benefícios em 390px, 1366px e "reduzir movimento" — sem rolagem horizontal, todo conteúdo revelado. Corrigidos: breadcrumb desalinhado e links dos painéis do hub < 48px
@@ -30,7 +30,7 @@
   - H1 com `view-transition-name: servico-{slug}` (M8)
   - avaliar Content Collections do Astro para os textos
 - ⬜ Páginas das demais áreas
-- ⬜ O escritório · Equipe · Contato
+- ✅ O escritório (`/escritorio`: onde fica, por dentro, equipe, depoimentos) · ⬜ Contato
 - ⬜ M3 (deriva do mármore, só desktop) — opcional
 
 ## Fase 3 — Publicação

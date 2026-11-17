@@ -1,0 +1,34 @@
+---
+/**
+ * Prova social: trechos de mensagens de clientes (src/data/depoimentos.ts).
+ * Compartilhada pela home e por /escritorio. Ver avisos de LGPD/OAB no arquivo de dados.
+ */
+import SectionHeading from "../ui/SectionHeading.astro";
+import Testimonial from "../ui/Testimonial.astro";
+import { depoimentos } from "../../data/depoimentos";
+
+interface Props {
+  id?: string;
+  alt?: boolean;
+}
+const { id = "depoimentos", alt = false } = Astro.props;
+---
+
+<section class:list={["section", { "section--alt": alt }]} id={id}>
+  <div class="container">
+    <SectionHeading
+      overline="Quem já passou por aqui"
+      title="O que dizem os clientes"
+      lead="Trechos de mensagens que recebemos. Os nomes foram omitidos para preservar a privacidade de cada pessoa."
+    />
+    <div class="dep grid" style="--grid-min: 18rem" data-reveal-group>
+      {depoimentos.map((d) => <Testimonial texto={d.texto} beneficio={d.beneficio} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section--alt { background: var(--color-surface); }
+  .dep { margin-top: var(--space-7); align-items: stretch; }
+  .section--alt .dep :global(.tm) { background: var(--color-bg); }
+</style>

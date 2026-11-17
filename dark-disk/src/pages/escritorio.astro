@@ -1,0 +1,231 @@
+---
+/**
+ * O escritório (/escritorio): onde fica, como é por dentro, quem atende e o que dizem os clientes.
+ * Fotos em src/assets/photos/ (recortadas dos originais em ../assets/fotos-hq, fora do git):
+ * fachada só com o letreiro (o vidro tem reflexo), sala principal com o brilho azul retocado.
+ * M2: a fachada entra por máscara (data-reveal-clip) com a luz de LED na borda (.led-frame).
+ */
+import { Picture } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import WhatsAppButton from "../components/ui/WhatsAppButton.astro";
+import LawyerCard from "../components/ui/LawyerCard.astro";
+import Icon from "../components/ui/Icon.astro";
+import Depoimentos from "../components/sections/Depoimentos.astro";
+import CtaFinal from "../components/sections/CtaFinal.astro";
+import { site } from "../data/site";
+import fachada from "../assets/photos/escritorio-fachada.jpg";
+import sala from "../assets/photos/escritorio-sala.jpg";
+import atendimento from "../assets/photos/escritorio-atendimento.jpg";
+
+const WHATSAPP_MENSAGEM = "Olá! Gostaria de combinar um horário para ir ao escritório.";
+const FORMATOS = ["webp"] as const; // AVIF via WASM deixa o build lento demais (~1 min por imagem)
+
+const infos = [
+  { icon: "map-pin", titulo: "Endereço", texto: site.endereco },
+  { icon: "home", titulo: "Como reconhecer", texto: site.fachada },
+  { icon: "clock", titulo: "Horário", texto: site.horario },
+  { icon: "message", titulo: "Atendimento", texto: "Presencial no escritório e também pelo WhatsApp." },
+] as const;
+---
+
+<Layout
+  title="O escritório | Macedo Neto Advocacia"
+  description="Conheça o escritório Macedo Neto: onde fica, as salas de atendimento e os advogados. Atendimento presencial e pelo WhatsApp."
+>
+  <SiteHeader />
+
+  <main id="conteudo">
+    <!-- Topo -->
+    <section class="topo tone-dark bg-marmore" aria-labelledby="titulo">
+      <div class="container">
+        <nav class="trilha" aria-label="Você está em">
+          <ol>
+            <li><a href="/">Início</a></li>
+            <li aria-current="page">O escritório</li>
+          </ol>
+        </nav>
+        <p class="overline" data-reveal>O escritório</p>
+        <h1 id="titulo" class="topo__titulo" data-reveal-mask>
+          <span class="mask-line"><span style="--i:0">Pode vir</span></span>
+          <span class="mask-line"><span style="--i:1">conversar</span></span>
+          <span class="mask-line"><span style="--i:2">com a gente.</span></span>
+        </h1>
+        <p class="lead topo__lead" data-reveal style="--i:3">
+          Um lugar tranquilo para contar o seu caso com calma. Se preferir, o atendimento também é pelo WhatsApp.
+        </p>
+        <div class="topo__acoes" data-reveal style="--i:4">
+          <WhatsAppButton message={WHATSAPP_MENSAGEM} label="Combinar uma visita" />
+          <a class="topo__link" href="#visite">Onde fica <Icon name="arrow-right" size={20} /></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. Onde estamos -->
+    <section class="section" id="visite">
+      <div class="container visite">
+        <figure class="foto foto--fachada led-frame" data-reveal-clip>
+          <Picture
+            src={fachada}
+            formats={FORMATOS}
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 60em) 55vw, 100vw"
+            alt="Fachada do escritório: letreiro de mármore escuro com o monograma e o nome Macedo Neto, Advocacia Especializada, e o número 108C."
+          />
+        </figure>
+        <div class="visite__info">
+          <SectionHeading overline="Onde estamos" title="Visite o escritório" />
+          <dl class="infos" data-reveal-group>
+            {infos.map((info) => (
+              <div class="info" data-reveal>
+                <dt><Icon name={info.icon} size={22} /> {info.titulo}</dt>
+                <dd>{info.texto}</dd>
+              </div>
+            ))}
+          </dl>
+          <div data-reveal><WhatsAppButton message={WHATSAPP_MENSAGEM} label="Combinar uma visita" /></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Por dentro -->
+    <section class="section section--alt" id="por-dentro">
+      <div class="container">
+        <SectionHeading
+          overline="Por dentro"
+          title="Salas para conversar com calma"
+          lead="O seu caso é tratado em sala reservada, com tempo para explicar e tirar dúvidas."
+        />
+        <div class="galeria">
+          <figure class="foto foto--sala" data-reveal-clip>
+            <Picture
+              src={sala}
+              formats={FORMATOS}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 60em) 62vw, 100vw"
+              alt="Sala principal: estante de madeira, painel de mármore iluminado com o logo do escritório, mesa e duas poltronas."
+              loading="lazy"
+            />
+            <figcaption>Sala principal</figcaption>
+          </figure>
+          <figure class="foto foto--atendimento" data-reveal-clip>
+            <Picture
+              src={atendimento}
+              formats={FORMATOS}
+              widths={[400, 800, 1200]}
+              sizes="(min-width: 60em) 32vw, 100vw"
+              alt="Sala de atendimento com mesa de madeira, computador e cadeiras."
+              loading="lazy"
+            />
+            <figcaption>Sala de atendimento</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Equipe -->
+    <section class="section" id="equipe">
+      <div class="container">
+        <SectionHeading
+          overline="Equipe"
+          title="Quem atende"
+          lead="Advogados inscritos na Ordem dos Advogados do Brasil, seccional do Maranhão."
+        />
+        <!-- PENDENTE: retratos e bios dos advogados (prop foto do LawyerCard). -->
+        <div class="equipe grid" style="--grid-min: 15rem" data-reveal-group>
+          {site.advogados.map((a) => <LawyerCard nome={a.nome} oab={a.oab} />)}
+        </div>
+      </div>
+    </section>
+
+    <Depoimentos alt />
+
+    <CtaFinal
+      linhas={["Prefere vir pessoalmente?", "Combine um horário."]}
+      texto="Mande uma mensagem pelo WhatsApp e a gente marca a sua visita. Se preferir, o atendimento também pode ser todo pelo WhatsApp."
+      mensagem={WHATSAPP_MENSAGEM}
+      label="Combinar uma visita"
+    />
+  </main>
+
+  <SiteFooter />
+  <WhatsAppButton variant="floating" message={WHATSAPP_MENSAGEM} />
+</Layout>
+
+<style>
+  section[id] { scroll-margin-top: 5rem; }
+  .section--alt { background: var(--color-surface); }
+
+  /* Topo (mesmo padrão do hub /previdenciario) */
+  .topo { padding-block: var(--space-6) var(--space-8); }
+  .trilha ol {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);
+    margin: 0 0 var(--space-7); padding: 0; list-style: none;
+    font-size: var(--text-small); color: var(--color-text-muted);
+  }
+  .trilha li + li::before { content: "›"; margin-right: var(--space-2); }
+  .trilha a { color: inherit; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  .trilha a:hover { color: var(--color-accent); }
+  .topo__titulo {
+    margin-block: var(--space-3) var(--space-5);
+    font-size: clamp(2.75rem, 1.6rem + 6vw, 6rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    color: var(--branco);
+  }
+  .topo__lead { max-width: 48ch; }
+  .topo__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); margin-top: var(--space-6); }
+  .topo__link {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--target-min);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-small);
+    color: var(--color-accent); text-decoration: none;
+  }
+  .topo__link:hover { color: var(--color-accent-hover); }
+
+  /* Fotos */
+  .foto { margin: 0; border-radius: var(--radius-md); overflow: hidden; background: var(--grafite-950); }
+  .foto :global(picture) { display: block; width: 100%; }
+  .foto :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .foto--fachada :global(picture) { height: 100%; }
+  .foto figcaption {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-small); color: var(--prata-300);
+    background: var(--grafite-950);
+  }
+  .foto--fachada { aspect-ratio: 16 / 9; }
+
+  /* Onde estamos */
+  .visite { display: grid; gap: var(--space-7); }
+  .visite__info { display: grid; gap: var(--space-6); justify-items: start; align-content: start; }
+  .infos { display: grid; gap: var(--space-5); margin: 0; }
+  .info { display: grid; gap: var(--space-1); }
+  .info dt {
+    display: flex; align-items: center; gap: var(--space-3);
+    font-family: var(--font-display); font-weight: 600;
+  }
+  .info dt :global(svg) { flex: none; color: var(--color-accent); }
+  .info dd { margin: 0; padding-left: calc(22px + var(--space-3)); color: var(--color-text-muted); }
+
+  /* Por dentro */
+  .galeria { display: grid; gap: var(--space-4); margin-top: var(--space-7); }
+  .foto--sala :global(picture) { aspect-ratio: 5 / 4; }
+  .foto--atendimento :global(picture) { aspect-ratio: 4 / 5; }
+
+  .equipe { margin-top: var(--space-7); }
+  /* Sem retrato ainda: no celular o cartão fica compacto (miniatura + nome), sem uma tela só de iniciais */
+  @media (max-width: 39.99em) {
+    .equipe :global(.lc) { grid-template-columns: 5.5rem 1fr; align-items: center; }
+    .equipe :global(.lc__photo) { font-size: var(--text-h3); }
+  }
+
+  @media (min-width: 60em) {
+    .visite { grid-template-columns: 1.3fr 1fr; gap: var(--space-8); align-items: center; }
+    .galeria { grid-template-columns: 2fr 1fr; align-items: stretch; }
+    .galeria .foto { display: grid; grid-template-rows: 1fr auto; }
+    .galeria .foto :global(picture) { height: 100%; }
+    .foto--sala :global(picture), .foto--atendimento :global(picture) { aspect-ratio: auto; min-height: 0; }
+  }
+</style>
